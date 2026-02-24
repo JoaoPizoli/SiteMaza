@@ -1,24 +1,42 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
+import { Menu } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
+import { MobileMenu } from "./MobileMenu";
 
 export function Navbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
-    <nav className="absolute top-0 left-0 w-full z-50 flex justify-center">
-      <div className="w-full max-w-[1440px] h-[101px] py-6 flex justify-between items-center px-6 xl:px-0">
-        {/* Logo Area */}
-        <Link href="/" className="flex-shrink-0">
-          <Image
-            src="/assets/navbar/logo-maza.png"
-            alt="Maza Logo"
-            width={125}
-            height={71}
-            priority
-            className="object-cover"
-          />
-        </Link>
-        
-        {/* Content Area */}
-        <div className="hidden lg:flex items-center gap-6 justify-end">
+    <>
+      <nav className="absolute top-0 left-0 w-full z-50 flex justify-center">
+        <div className="w-full max-w-[1440px] h-[101px] py-6 flex justify-between items-center px-6 xl:px-0">
+          {/* Logo Area */}
+          <Link href="/" className="flex-shrink-0">
+            <Image
+              src="/assets/navbar/logo-maza.png"
+              alt="Maza Logo"
+              width={125}
+              height={71}
+              priority
+              className="object-cover"
+            />
+          </Link>
+          
+          {/* Mobile Menu Button */}
+          <button 
+            className="lg:hidden p-2 text-white hover:opacity-80 transition-opacity"
+            onClick={() => setIsMenuOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={32} />
+          </button>
+          
+          {/* Content Area */}
+          <div className="hidden lg:flex items-center gap-6 justify-end">
           {/* Nav Items 1 */}
           <div className="flex items-center gap-6">
             <Link href="/sobre" className="font-medium text-base leading-[1.5em] text-white hover:opacity-80 transition-opacity">
@@ -93,6 +111,10 @@ export function Navbar() {
         </div>
       </div>
     </nav>
+      <AnimatePresence>
+        {isMenuOpen && <MobileMenu onClose={() => setIsMenuOpen(false)} />}
+      </AnimatePresence>
+    </>
   );
 }
 
