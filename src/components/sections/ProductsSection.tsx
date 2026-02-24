@@ -38,7 +38,7 @@ export function ProductsSection() {
         {/* Header Row */}
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8 w-full">
           {/* Left: Headings */}
-          <motion.div className="flex flex-col gap-8" variants={itemVariants}>
+          <motion.div className="flex flex-col gap-8 w-full" variants={itemVariants}>
             <div className="flex flex-col gap-2">
               {/* Tag: Produtos */}
               <div className="flex items-center justify-center gap-[10px] px-2 py-1 w-fit rounded-[50px] bg-[rgba(251,185,67,0.2)] border border-[rgba(255,217,150,0.3)] backdrop-blur-[87.7px]">
@@ -50,25 +50,6 @@ export function ProductsSection() {
               <h2 className="font-roboto font-semibold text-[49px] leading-[1.4em] text-[#1C1C1C]"> 
                 Nossas linhas de produtos.
               </h2>
-            </div>
-          </motion.div>
-
-          {/* Right: Search Form */}
-          <motion.div className="w-full md:w-auto" variants={itemVariants}>
-            <div className="flex items-center justify-between w-full md:w-[561px] h-[56px] pl-6 pr-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-[200px] shadow-sm">
-              <input
-                type="text"
-                placeholder="Digite o nome do produto"
-                className="flex-1 bg-transparent border-none outline-none text-base text-[#64748B] placeholder:text-[#64748B]"
-              />
-              <button className="w-[47px] h-[41px] flex items-center justify-center bg-[#A00010] rounded-[50px] hover:bg-[#8a000e] transition-colors">
-                <Image
-                  src="/assets/products/search-btn.svg"
-                  alt="Search"
-                  width={20}
-                  height={20}
-                />
-              </button>
             </div>
           </motion.div>
         </div>

@@ -5,10 +5,10 @@ export function AboutSection() {
     <section className="w-full flex justify-center pb-[240px] px-4 md:px-0">
       <div className="w-full max-w-[1440px] flex flex-col items-center gap-[48px]">
         
-        <div className="w-full flex flex-col lg:flex-row justify-between gap-[35px]">
+        <div className="w-full flex flex-col xl:flex-row justify-between gap-[35px]">
           
           {/* Left Column */}
-          <div className="flex flex-col justify-between gap-8 lg:gap-[32px] w-full lg:w-auto">
+          <div className="flex flex-col justify-between gap-8 lg:gap-[32px] w-full xl:w-auto">
             
             {/* Texts */}
             <div className="flex flex-col gap-[16px]">
@@ -37,33 +37,31 @@ export function AboutSection() {
             </div>
             
             {/* Big Numbers */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-8 sm:gap-[97px] w-full max-w-[730px]">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-8 w-full max-w-[800px]">
               {/* Group 1 */}
-              <div className="flex items-center gap-[24px]">
-                 <span className="font-roboto font-semibold text-[39px] leading-[1.4em] text-[#A00010] whitespace-nowrap">+27</span>
-                 <span className="font-roboto font-bold text-[16px] leading-[1.5em] text-[#1C1C1C]">Anos no mercado</span>
+              <div className="flex items-center gap-[16px] sm:gap-[24px]">
+                 <span className="font-roboto font-semibold text-[32px] sm:text-[39px] leading-[1.4em] text-[#A00010] whitespace-nowrap">+27</span>
+                 <span className="font-roboto font-bold text-[14px] sm:text-[16px] leading-[1.5em] text-[#1C1C1C]">Anos no mercado</span>
               </div>
               
               <div className="hidden sm:block w-[1px] h-[50px] bg-[#F1F1EA]"></div>
               
-               {/* Group 2 */}
-              <div className="flex items-center gap-[24px]">
-                 <span className="font-roboto font-semibold text-[39px] leading-[1.4em] text-[#A00010] whitespace-nowrap">+600</span>
-                 <span className="font-roboto font-bold text-[16px] leading-[1.5em] text-[#1C1C1C]">Cargas ofertadas<br/>por mês</span>
+              <div className="flex items-center gap-[16px] sm:gap-[24px]">
+                 <span className="font-roboto font-semibold text-[32px] sm:text-[39px] leading-[1.4em] text-[#A00010] whitespace-nowrap">+600</span>
+                 <span className="font-roboto font-bold text-[14px] sm:text-[16px] leading-[1.5em] text-[#1C1C1C]">Cargas ofertadas<br/>por mês</span>
               </div>
               
               <div className="hidden sm:block w-[1px] h-[50px] bg-[#F1F1EA]"></div>
               
-               {/* Group 3 */}
-              <div className="flex items-center gap-[24px]">
-                 <span className="font-roboto font-semibold text-[39px] leading-[1.4em] text-[#A00010] whitespace-nowrap">+ 85</span>
-                 <span className="font-roboto font-bold text-[16px] leading-[1.5em] text-[#1C1C1C]">Transportadoras<br/>parceiras</span>
+              <div className="flex items-center gap-[16px] sm:gap-[24px]">
+                 <span className="font-roboto font-semibold text-[32px] sm:text-[39px] leading-[1.4em] text-[#A00010] whitespace-nowrap">+ 85</span>
+                 <span className="font-roboto font-bold text-[14px] sm:text-[16px] leading-[1.5em] text-[#1C1C1C]">Transportadoras<br/>parceiras</span>
               </div>
             </div>
           </div>
 
           {/* Right Column (Image) */}
-          <div className="w-full max-w-[669px] h-[493px] relative rounded-[8px] overflow-hidden bg-gray-100 flex items-center justify-center">
+          <div className="w-full max-w-[669px] aspect-[669/493] relative rounded-[8px] overflow-hidden bg-gray-100 flex items-center justify-center">
               {/* Placeholder */}
               <span className="text-gray-400">Image Asset Placeholder</span>
           </div>

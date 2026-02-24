@@ -32,7 +32,7 @@ export function HeroSection() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/assets/home/hero-bg.jpg"
+          src="/assets/home/hero-bg.png"
           alt="Hero Background"
           fill
           priority
@@ -96,7 +96,7 @@ export function HeroSection() {
                 ENCONTRE UM REPRESENTANTE
               </span>
               <div className="w-6 h-6 flex items-center justify-center">
-                 <Image
+                <Image
                   src="/assets/home/arrow-up-right.svg"
                   alt="Arrow Up Right"
                   width={24}
@@ -121,11 +121,11 @@ export function HeroSection() {
           transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
         >
           <Image
-            src="/assets/home/scroll-down.svg"
+            src="/assets/home/icon-down-hero.svg"
             alt="Scroll Down"
-            width={40}
-            height={40}
-            className="drop-shadow-[0_4px_60px_rgba(160,0,16,0.3)]"
+            width={120}
+            height={120}
+            className=""
           />
         </motion.div>
       </motion.div>
