@@ -61,7 +61,7 @@ export function ProductsSection() {
             title="Imobiliária"
             icon="/assets/figma/icon-imobiliaria.svg"
             image="/assets/figma/imobiliaria.png"
-            href="/produtos/imobiliaria"
+            href="/produtos?category=imobiliaria&subcategory=Acabamentos"
             variants={itemVariants}
           />
 
@@ -70,7 +70,7 @@ export function ProductsSection() {
             title="Automotivo"
             icon="/assets/figma/icon-automotivo.svg"
             image="/assets/figma/automotivo.png"
-            href="/produtos/automotivo"
+            href="/produtos?category=automotiva&subcategory=Adesivos"
             variants={itemVariants}
           />
 
@@ -79,7 +79,7 @@ export function ProductsSection() {
             title="Industrial"
             icon="/assets/figma/icon-industrial.svg"
             image="/assets/figma/industrial.png"
-            href="/produtos/industrial"
+            href="/produtos?category=industrial&subcategory=Anticorrosivos"
             variants={itemVariants}
           />
 
@@ -88,7 +88,7 @@ export function ProductsSection() {
             title="Impermeabilizantes"
             icon="/assets/figma/icon-impermeabilizantes.svg"
             image="/assets/figma/impermeabilizantes.png"
-            href="/produtos/impermeabilizantes"
+            href="/produtos?category=impermeabilizantes&subcategory=Mantas%20L%C3%ADquidas"
             variants={itemVariants}
           />
         </div>

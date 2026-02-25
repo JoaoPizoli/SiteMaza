@@ -7,8 +7,19 @@ import { Menu } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import { MobileMenu } from "./MobileMenu";
 
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const isDarkText = pathname === "/sobre" || pathname?.startsWith("/produtos") || pathname?.startsWith("/produto");
+  
+  const logoSrc = isDarkText ? "/assets/figma/logo-maza.svg" : "/assets/navbar/logo-maza.png";
+  const textColor = isDarkText ? "text-[#1C1C1C]" : "text-white";
+  const hoverColor = isDarkText ? "hover:text-black" : "hover:text-white/80";
+  const borderColor = isDarkText ? "border-[#1C1C1C]/20" : "border-white/20";
+  const iconFilter = isDarkText ? "brightness(0)" : "";
 
   return (
     <>
@@ -17,7 +28,7 @@ export function Navbar() {
           {/* Logo Area */}
           <Link href="/" className="flex-shrink-0">
             <Image
-              src="/assets/navbar/logo-maza.png"
+              src={logoSrc}
               alt="Maza Logo"
               width={125}
               height={71}
@@ -28,7 +39,7 @@ export function Navbar() {
           
           {/* Mobile Menu Button */}
           <button 
-            className="lg:hidden p-2 text-white hover:opacity-80 transition-opacity"
+            className={cn("lg:hidden p-2 transition-opacity hover:opacity-80", textColor)}
             onClick={() => setIsMenuOpen(true)}
             aria-label="Open menu"
           >
@@ -39,12 +50,12 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-6 justify-end">
           {/* Nav Items 1 */}
           <div className="flex items-center gap-6">
-            <Link href="/sobre" className="font-medium text-base leading-[1.5em] text-white hover:opacity-80 transition-opacity">
+            <Link href="/sobre" className={cn("font-medium text-base leading-[1.5em] transition-opacity hover:opacity-80", textColor)}>
               Sobre a Maza
             </Link>
             
             <Link href="/produtos" className="flex items-center gap-1 group">
-              <span className="font-medium text-base leading-[1.5em] text-white group-hover:opacity-80 transition-opacity">
+              <span className={cn("font-medium text-base leading-[1.5em] transition-opacity group-hover:opacity-80", textColor)}>
                 Linha de produtos
               </span>
               <Image
@@ -52,22 +63,25 @@ export function Navbar() {
                 alt="Arrow"
                 width={18}
                 height={18}
+                style={{ filter: iconFilter }}
               />
             </Link>
             
-            <Link href="/representantes" className="font-normal text-base leading-[1.5em] text-white hover:opacity-80 transition-opacity">
+            <Link href="/onde-encontrar" className={cn("font-normal text-base leading-[1.5em] transition-opacity hover:opacity-80", textColor)}>
               Representantes
             </Link>
           </div>
 
           {/* Divisor */}
-          <div className="w-px h-8 bg-white/20 rounded"></div>
+          <div className={cn("w-px h-8 rounded", isDarkText ? "bg-[#1C1C1C]/20" : "bg-white/20")}></div>
 
           {/* Nav Items 2 */}
           <div className="flex items-center gap-4">
             <Link 
               href="/onde-encontrar" 
-              className="flex items-center gap-1 p-1 pr-3 bg-[rgba(177,17,22,0.2)] border border-[rgba(255,181,189,0.3)] backdrop-blur-[87.7px] rounded text-[#FFC9CB] hover:bg-[rgba(177,17,22,0.3)] transition-colors"
+              className={cn("flex items-center gap-1 p-1 pr-3 bg-[rgba(177,17,22,0.2)] border border-[rgba(255,181,189,0.3)] backdrop-blur-[87.7px] rounded hover:bg-[rgba(177,17,22,0.3)] transition-colors",
+                isDarkText ? "text-[#1C1C1C]" : "text-[#FFC9CB]"
+              )}
             >
               <div className="w-[17px] h-[18px] flex items-center justify-center">
                 <Image
@@ -75,6 +89,7 @@ export function Navbar() {
                   alt="Map Pin"
                   width={17}
                   height={18}
+                  style={{ filter: isDarkText ? "brightness(0)" : "" }}
                 />
               </div>
               <span className="font-normal text-base leading-[1.5em]">Onde encontrar</span>
@@ -98,14 +113,17 @@ export function Navbar() {
 
           {/* Search Button */}
           <button 
-            className="flex items-center justify-center w-8 h-8 p-1 bg-[rgba(241,241,234,0.2)] border border-[rgba(185,185,185,0.3)] rounded hover:bg-[rgba(241,241,234,0.3)] transition-colors"
+            className={cn("flex items-center justify-center w-8 h-8 p-1 rounded transition-colors", 
+              isDarkText ? "bg-[#1C1C1C]/10 border border-[#1C1C1C]/20 hover:bg-[#1C1C1C]/20" : "bg-[rgba(241,241,234,0.2)] border border-[rgba(185,185,185,0.3)] hover:bg-[rgba(241,241,234,0.3)]"
+            )}
             aria-label="Search"
           >
-             <Image
+            <Image
               src="/assets/navbar/search-icon.svg"
               alt="Search"
               width={24}
               height={24}
+              className="object-cover"
             />
           </button>
         </div>
