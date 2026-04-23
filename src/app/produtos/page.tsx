@@ -2,178 +2,193 @@
 
 import * as React from "react";
 import { Suspense } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
+import { ArrowUpRight, FolderSearch } from "lucide-react";
 import { FilterSidebar } from "@/components/products/FilterSidebar";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ProductSort } from "@/components/products/ProductSort";
+import { Button } from "@/components/ui/button";
+import {
+  filterProducts,
+  getProductLine,
+  type ProductLineId,
+} from "@/lib/products";
 
-import { PRODUCTS } from "@/lib/products";
+function sortProducts(products: ReturnType<typeof filterProducts>, option: string) {
+  const sorted = [...products];
+
+  if (option === "Nome (A-Z)") {
+    sorted.sort((a, b) => a.title.localeCompare(b.title));
+  }
+
+  if (option === "Nome (Z-A)") {
+    sorted.sort((a, b) => b.title.localeCompare(a.title));
+  }
+
+  if (option === "Linha (A-Z)") {
+    sorted.sort((a, b) => a.lineLabel.localeCompare(b.lineLabel));
+  }
+
+  return sorted;
+}
 
 function ProductsContent() {
   const searchParams = useSearchParams();
-  const [filteredProducts, setFilteredProducts] = React.useState(PRODUCTS);
-  const [initialCategory, setInitialCategory] = React.useState<string | null>(null);
-  const [initialSubcategory, setInitialSubcategory] = React.useState<string | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [activeLine, setActiveLine] = React.useState<string | null>(null);
+  const [activeSubcategory, setActiveSubcategory] = React.useState<string | null>(
+    null,
+  );
+  const [sortOption, setSortOption] = React.useState("Mais relevantes");
 
   React.useEffect(() => {
-    const category = searchParams.get("category");
-    const subcategory = searchParams.get("subcategory");
-
-    if (category) {
-      setInitialCategory(category);
-      if (subcategory) {
-        setInitialSubcategory(subcategory);
-      }
-      
-      // Apply filter immediately
-      const filtered = PRODUCTS.filter((product) => {
-        // Mock filtering logic - needs to match the Sidebar logic
-        if (category === "automotiva") return ["Esmalte Sintético", "Verniz"].includes(product.category); // This mock logic is a bit weak, but I'll keep it consistent with the existing mock for now. 
-        // ideally we should filter by subcategory if present
-        if (subcategory) {
-             // Since our mock data doesn't explicitly have subcategories, we might need to rely on the existing category mapping or just show all for the category for now if exact match fails.
-             // But the user asked for "filtered by Adesivos". 
-             // Our mock data `PRODUCTS` has `category` like "Piso Premium", "Esmalte Sintético".
-             // These map to subcategories in the Sidebar logic? 
-             // Let's look at FilterSidebar logic again.
-             // It maps sidebar categories to product categories.
-             return true; 
-        }
-
-        if (category === "automotiva") return ["Esmalte Sintético", "Verniz"].includes(product.category);
-        if (category === "imobiliaria") return ["Piso Premium", "Tinta Acrílica", "Massa Corrida"].includes(product.category);
-        if (category === "impermeabilizantes") return ["Impermeabilizante"].includes(product.category);
-        return true;
-      });
-      setFilteredProducts(filtered);
-    }
+    setActiveLine(searchParams.get("category"));
+    setActiveSubcategory(searchParams.get("subcategory"));
   }, [searchParams]);
 
-  const handleSearch = (query: string) => {
-    const lowerQuery = query.toLowerCase();
-    const filtered = PRODUCTS.filter(
-      (product) =>
-        product.title.toLowerCase().includes(lowerQuery) ||
-        product.description.toLowerCase().includes(lowerQuery) ||
-        product.category.toLowerCase().includes(lowerQuery)
-    );
-    setFilteredProducts(filtered);
-  };
+  const filteredProducts = sortProducts(
+    filterProducts({
+      search: searchQuery,
+      line: activeLine,
+      subcategory: activeSubcategory,
+    }),
+    sortOption,
+  );
 
-  const handleFilterChange = (category: string, subcategory?: string) => {
-    // In a real app, this would filter by category ID or slug
-    // For now, we'll just filter by string match if category matches
-    if (!category) {
-      setFilteredProducts(PRODUCTS);
-      return;
-    }
-    
-    // Mock filtering logic
-    const filtered = PRODUCTS.filter((product) => {
-        // Simple mapping for demo purposes
-        if (category === "automotiva") return ["Esmalte Sintético", "Verniz"].includes(product.category);
-        if (category === "imobiliaria") return ["Piso Premium", "Tinta Acrílica", "Massa Corrida"].includes(product.category);
-        if (category === "impermeabilizantes") return ["Impermeabilizante"].includes(product.category);
-        return true;
-      });
-    setFilteredProducts(filtered);
-  };
+  const activeLineData = activeLine
+    ? getProductLine(activeLine as ProductLineId)
+    : null;
 
-  const handleSortChange = (option: string) => {
-    let sorted = [...filteredProducts];
-    if (option === "Nome (A-Z)") {
-      sorted.sort((a, b) => a.title.localeCompare(b.title));
-    } else if (option === "Nome (Z-A)") {
-      sorted.sort((a, b) => b.title.localeCompare(a.title));
-    } else if (option === "Menor preço") {
-      sorted.sort((a, b) => a.id - b.id); // Mock logic for price
-    } else if (option === "Maior preço") {
-      sorted.sort((a, b) => b.id - a.id); // Mock logic for price
-    }
-    setFilteredProducts(sorted);
+  const clearAllFilters = () => {
+    setSearchQuery("");
+    setActiveLine(null);
+    setActiveSubcategory(null);
+    setSortOption("Mais relevantes");
   };
 
   return (
-    <main className="w-full min-h-screen bg-[#F8FAFC] flex justify-center py-20 md:pt-[260px] md:pb-[160px] px-6 xl:px-0">
-      <div className="w-full max-w-[1440px] flex flex-col gap-12">
-        
-        {/* Header Section (Mobile only visible here, Desktop is split) */}
-        <div className="flex flex-col gap-4 md:hidden">
-            <div className="flex items-center gap-[10px] px-2 py-1 w-fit rounded-[50px] bg-[rgba(251,185,67,0.2)] border border-[rgba(255,217,150,0.3)] backdrop-blur-[87.7px]">
-                <span className="font-black text-[13px] leading-[1.5em] tracking-[0.12em] text-[#FBB943]">
-                  PRODUTOS
-                </span>
-            </div>
-            <h1 className="font-roboto font-semibold text-[32px] leading-[1.2em] text-[#1C1C1C]">
-                Nossos produtos.
-            </h1>
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-12 relative">
-            
-          {/* Left Column: Products Grid & Header */}
-          <div className="flex-1 flex flex-col gap-12">
-            
-            {/* Desktop Header */}
-            <div className="hidden md:flex flex-col gap-4">
-                 <div className="flex items-center gap-[10px] px-2 py-1 w-fit rounded-[50px] bg-[rgba(251,185,67,0.2)] border border-[rgba(255,217,150,0.3)] backdrop-blur-[87.7px]">
-                    <span className="font-black text-[13px] leading-[1.5em] tracking-[0.12em] text-[#FBB943]">
-                      BEM VINDO A MAZA!
-                    </span>
-                </div>
-                <h1 className="font-roboto font-semibold text-[49px] leading-[1.4em] text-[#1C1C1C]">
-                    Nossos produtos.
-                </h1>
+    <main className="pb-24 pt-28 md:pb-32 md:pt-40">
+      <div className="site-container">
+        <section className="surface-panel-dark relative overflow-hidden p-8 md:p-10">
+          <div className="outline-grid absolute inset-0 opacity-25" />
+          <div className="relative z-10 grid gap-6 lg:grid-cols-[1.06fr_0.94fr] lg:items-end">
+            <div>
+              <span className="section-tag">Catalogo Maza</span>
+              <h1 className="mt-5 max-w-[10ch] font-display text-4xl leading-[1.02] text-white md:text-[4.25rem]">
+                Produtos organizados para uma navegacao mais profissional.
+              </h1>
+              <p className="mt-5 max-w-[58ch] text-base leading-8 text-white/74">
+                O catalogo agora reforca hierarquia, leitura de linha,
+                argumentos comerciais e direcionamento rapido para as categorias
+                certas.
+              </p>
             </div>
 
-            {/* Results Info & Sort (Optional, placeholder from design) */}
-            <div className="flex flex-col-reverse sm:flex-row items-start sm:items-center justify-between gap-4">
-                <span className="text-sm text-[#64748B]">
-                    Mostrando {filteredProducts.length} resultados
-                </span>
-                <ProductSort onSortChange={handleSortChange} />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-[28px] border border-white/10 bg-white/8 p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gold">
+                  Resultados
+                </p>
+                <p className="mt-3 font-display text-4xl text-white">
+                  {filteredProducts.length}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-white/64">
+                  produtos apresentados com filtro e ordenacao.
+                </p>
+              </div>
+
+              <div className="rounded-[28px] border border-white/10 bg-white/8 p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gold">
+                  Linha ativa
+                </p>
+                <p className="mt-3 text-lg font-semibold text-white">
+                  {activeLineData?.label ?? "Todas as linhas"}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-white/64">
+                  {activeLineData?.description ??
+                    "Explore todo o portfolio Maza com uma vitrine mais refinada."}
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-8 grid gap-8 xl:grid-cols-[320px_1fr]">
+          <div className="xl:sticky xl:top-28 xl:self-start">
+            <FilterSidebar
+              onSearch={setSearchQuery}
+              onFilterChange={(category, subcategory) => {
+                setActiveLine(category || null);
+                setActiveSubcategory(subcategory ?? null);
+              }}
+              initialCategory={activeLine}
+              initialSubcategory={activeSubcategory}
+              searchValue={searchQuery}
+            />
+          </div>
+
+          <div className="space-y-6">
+            <div className="surface-panel flex flex-col gap-5 p-6 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand/70">
+                  Visao do catalogo
+                </p>
+                <p className="mt-2 text-sm leading-7 text-stone">
+                  {activeSubcategory
+                    ? `Subcategoria selecionada: ${activeSubcategory}.`
+                    : "Apresentacao limpa e organizada para facilitar decisao e especificacao."}
+                </p>
+              </div>
+
+              <ProductSort onSortChange={setSortOption} value={sortOption} />
             </div>
 
-            {/* Products Grid */}
             {filteredProducts.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid gap-6 md:grid-cols-2 2xl:grid-cols-3">
                 {filteredProducts.map((product) => (
-                    <ProductCard
+                  <ProductCard
                     key={product.id}
                     image={product.image}
+                    lineLabel={product.lineLabel}
                     category={product.category}
+                    subcategory={product.subcategory}
+                    title={product.title}
                     description={product.description}
                     href={product.href}
-                    />
+                  />
                 ))}
-                </div>
+              </div>
             ) : (
-                <div className="w-full py-20 flex flex-col items-center justify-center text-center gap-4">
-                    <p className="text-lg text-[#64748B]">Nenhum produto encontrado.</p>
-                    <button 
-                        onClick={() => setFilteredProducts(PRODUCTS)}
-                        className="text-[#FBB943] font-medium hover:underline"
-                    >
-                        Limpar filtros
-                    </button>
+              <div className="surface-panel flex flex-col items-center justify-center gap-5 px-6 py-16 text-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand/8 text-brand">
+                  <FolderSearch className="h-8 w-8" />
                 </div>
+                <div>
+                  <h2 className="font-display text-3xl text-ink">
+                    Nenhum produto encontrado
+                  </h2>
+                  <p className="mt-3 max-w-[44ch] text-sm leading-7 text-stone">
+                    Limpe os filtros para voltar ao portfolio completo ou ajuste
+                    a busca para encontrar outra linha.
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Button onClick={clearAllFilters} size="lg">
+                    Limpar filtros
+                  </Button>
+                  <Button asChild size="lg" variant="outline">
+                    <Link href="/produtos">
+                      Atualizar catalogo
+                      <ArrowUpRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </div>
             )}
           </div>
-
-          {/* Right Column: Sidebar */}
-          <div className="w-full lg:w-[320px] shrink-0">
-             <div className="sticky top-24">
-                <FilterSidebar 
-                    onSearch={handleSearch}
-                    onFilterChange={handleFilterChange}
-                    initialCategory={initialCategory}
-                    initialSubcategory={initialSubcategory}
-                />
-             </div>
-          </div>
-
-        </div>
+        </section>
       </div>
     </main>
   );

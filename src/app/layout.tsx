@@ -1,28 +1,34 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Roboto } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const displayFont = localFont({
+  src: [{ path: "./fonts/bahnschrift.ttf", weight: "400 800", style: "normal" }],
+  variable: "--font-sora",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const roboto = Roboto({
+const bodyFont = localFont({
+  src: [
+    { path: "./fonts/segoeui.ttf", weight: "400", style: "normal" },
+    { path: "./fonts/segoeuib.ttf", weight: "700", style: "normal" },
+  ],
   variable: "--font-roboto",
-  subsets: ["latin"],
-  weight: ["100", "300", "400", "500", "700", "900"],
+  display: "swap",
+});
+
+const monoFont = localFont({
+  src: [{ path: "./fonts/segoeui.ttf", weight: "400", style: "normal" }],
+  variable: "--font-geist-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Tintas Maza - Paixão por Qualidade",
-  description: "Há 27 anos no mercado, a Tintas Maza se destaca na fabricação de tintas imobiliárias, automotivas, industriais e solventes.",
+  title: "Tintas Maza | Solucoes profissionais em tintas e revestimentos",
+  description:
+    "Tintas Maza desenvolve solucoes imobiliarias, automotivas, industriais e impermeabilizantes com foco em desempenho, acabamento e confianca comercial.",
 };
 
 export default function RootLayout({
@@ -31,10 +37,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${roboto.variable}`}>  
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable} antialiased`}
-      >
+    <html
+      lang="pt-BR"
+      className={`${displayFont.variable} ${bodyFont.variable} ${monoFont.variable}`}
+    >
+      <body>
         <Navbar />
         {children}
         <Footer />

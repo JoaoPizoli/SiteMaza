@@ -6,7 +6,7 @@ import { FindUsSection } from "@/components/sections/FindUsSection";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col">
+    <main className="flex min-h-screen flex-col overflow-hidden">
       <HeroSection />
       <ProductsSection />
       <AboutSection />

@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Search, ChevronDown, ChevronRight, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown, Search, X } from "lucide-react";
+import { PRODUCT_FILTERS } from "@/lib/products";
 import { cn } from "@/lib/utils";
 
 interface FilterSidebarProps {
@@ -10,96 +11,51 @@ interface FilterSidebarProps {
   onSearch: (query: string) => void;
   onFilterChange: (category: string, subcategory?: string) => void;
   initialCategory?: string | null;
-  initialSubcategory?: string;
+  initialSubcategory?: string | null;
+  searchValue?: string;
 }
 
-const CATEGORIES = [
-  {
-    id: "automotiva",
-    label: "Automotiva",
-    subcategories: [
-      "Adesivos",
-      "Complementos",
-      "Primer e Verniz",
-      "Tinta Poliester",
-      "Tinta PU",
-      "Esmalte Sintético",
-      "Massa Poliéster",
-      "Massa Rápida",
-      "Removedor",
-    ],
-  },
-  {
-    id: "imobiliaria",
-    label: "Imobiliária",
-    subcategories: [
-      "Acabamentos",
-      "Complementos",
-      "Esmaltes",
-      "Massas",
-      "Texturas",
-      "Tintas",
-      "Vernizes",
-    ],
-  },
-  {
-    id: "industrial",
-    label: "Industrial",
-    subcategories: [
-      "Anticorrosivos",
-      "Demarcação Viária",
-      "Epóxi",
-      "Esmaltes",
-      "Primers",
-      "Tintas",
-    ],
-  },
-  {
-    id: "impermeabilizantes",
-    label: "Impermeabilizantes",
-    subcategories: [
-      "Mantas Líquidas",
-      "Aditivos",
-      "Complementos",
-      "Fitas",
-      "Mantas Asfálticas",
-    ],
-  },
-];
-
-export function FilterSidebar({ 
-  className, 
-  onSearch, 
+export function FilterSidebar({
+  className,
+  onSearch,
   onFilterChange,
   initialCategory,
-  initialSubcategory 
+  initialSubcategory,
+  searchValue,
 }: FilterSidebarProps) {
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [openSection, setOpenSection] = React.useState<string | null>("automotiva");
-  const [activeFilter, setActiveFilter] = React.useState<{ category: string; subcategory?: string } | null>(null);
+  const [openSection, setOpenSection] = React.useState<string | null>(
+    initialCategory ?? PRODUCT_FILTERS[0]?.id ?? null,
+  );
+  const [activeFilter, setActiveFilter] = React.useState<{
+    category: string;
+    subcategory?: string;
+  } | null>(
+    initialCategory
+      ? { category: initialCategory, subcategory: initialSubcategory ?? undefined }
+      : null,
+  );
 
   React.useEffect(() => {
     if (initialCategory) {
       setOpenSection(initialCategory);
-      if (initialSubcategory) {
-        setActiveFilter({ category: initialCategory, subcategory: initialSubcategory });
-      } else {
-         // If only category is provided, maybe we don't select a subcategory yet, 
-         // or we select the first one if implied? 
-         // The user said "filtrando pela primeira sessão". 
-         // The parent component passes the first subcategory. 
-         // So if initialSubcategory is passed, we use it.
-      }
+      setActiveFilter({
+        category: initialCategory,
+        subcategory: initialSubcategory ?? undefined,
+      });
+      return;
     }
+
+    setActiveFilter(null);
   }, [initialCategory, initialSubcategory]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSearch(searchQuery);
-  };
+  React.useEffect(() => {
+    setSearchQuery(searchValue ?? "");
+  }, [searchValue]);
 
-  const toggleSection = (id: string) => {
-    setOpenSection(openSection === id ? null : id);
+  const handleSearch = (event: React.FormEvent) => {
+    event.preventDefault();
+    onSearch(searchQuery);
   };
 
   const handleFilterClick = (category: string, subcategory?: string) => {
@@ -109,98 +65,158 @@ export function FilterSidebar({
 
   const clearFilter = () => {
     setActiveFilter(null);
+    setSearchQuery("");
+    onSearch("");
     onFilterChange("");
   };
 
   return (
-    <aside className={cn("flex flex-col gap-8 w-full max-w-[300px]", className)}>
-      {/* Search Form */}
-      <form onSubmit={handleSearch} className="relative w-full">
-        <div className="relative flex items-center w-full h-12 rounded-full border border-[#E2E8F0] bg-white overflow-hidden focus-within:ring-2 focus-within:ring-[#B11116] transition-all">
-          <input
-            type="text"
-            placeholder="Digite o nome do produto"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-full pl-6 pr-12 text-sm text-[#1C1C1C] placeholder:text-[#94A3B8] outline-none bg-transparent"
-          />
-          <button
-            type="submit"
-            className="absolute right-1 top-1 bottom-1 aspect-square flex items-center justify-center rounded-full bg-[#B11116] hover:bg-[#8B0D11] text-white transition-colors"
-          >
-            <Search className="w-4 h-4" />
-          </button>
-        </div>
-      </form>
+    <aside className={cn("flex w-full flex-col gap-5", className)}>
+      <div className="surface-panel p-5">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-brand/70">
+          Busca rapida
+        </span>
 
-      {/* Active Filter Display */}
-      {activeFilter && (
-        <div className="flex items-center gap-2 p-2 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0]">
-          <span className="text-xs font-medium text-[#64748B]">
-            Filtrando por: <span className="text-[#1C1C1C]">{activeFilter.subcategory || activeFilter.category}</span>
-          </span>
-          <button onClick={clearFilter} className="ml-auto text-[#94A3B8] hover:text-[#EF4444]">
-            <X className="w-3 h-3" />
-          </button>
-        </div>
-      )}
-
-      {/* Categories Accordion */}
-      <div className="flex flex-col w-full border-t border-[#E2E8F0]">
-        {CATEGORIES.map((category) => (
-          <div key={category.id} className="border-b border-[#E2E8F0]">
+        <form onSubmit={handleSearch} className="mt-4">
+          <div className="relative flex items-center rounded-full border border-[#171d29]/10 bg-white px-4 py-2.5 shadow-[0_10px_24px_rgba(15,23,42,0.06)]">
+            <Search className="h-4 w-4 text-brand" />
+            <input
+              type="text"
+              placeholder="Buscar produto"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              className="h-11 w-full bg-transparent pl-3 pr-12 text-sm text-ink outline-none placeholder:text-stone"
+            />
             <button
-              onClick={() => toggleSection(category.id)}
-              className="flex items-center justify-between w-full py-4 text-left group"
+              type="submit"
+              className="absolute right-2 flex h-10 w-10 items-center justify-center rounded-full bg-brand text-white transition-colors hover:bg-brand-strong"
+              aria-label="Pesquisar"
             >
-              <span className={cn(
-                "font-bold text-lg transition-colors",
-                openSection === category.id ? "text-[#B11116]" : "text-[#1C1C1C] group-hover:text-[#B11116]"
-              )}>
-                {category.label}
-              </span>
-              <ChevronDown 
-                className={cn(
-                  "w-5 h-5 text-[#94A3B8] transition-transform duration-300",
-                  openSection === category.id ? "rotate-180 text-[#B11116]" : ""
-                )} 
-              />
+              <Search className="h-4 w-4" />
             </button>
-            
-            <AnimatePresence>
-              {openSection === category.id && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="overflow-hidden"
-                >
-                  <div className="flex flex-col gap-2 pb-4 pl-4">
-                    {category.subcategories.map((sub) => (
+          </div>
+        </form>
+
+        <p className="mt-4 text-sm leading-6 text-stone">
+          Filtre por linha ou subcategoria para apresentar o portfolio certo
+          com mais rapidez.
+        </p>
+      </div>
+
+      {activeFilter ? (
+        <div className="surface-panel flex items-start gap-3 p-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand/70">
+              Filtro ativo
+            </p>
+            <p className="mt-2 text-sm text-ink">
+              {activeFilter.subcategory ?? activeFilter.category}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={clearFilter}
+            className="ml-auto flex h-9 w-9 items-center justify-center rounded-full border border-[#171d29]/10 bg-sand/60 text-stone transition-colors hover:border-brand/20 hover:text-brand"
+            aria-label="Limpar filtros"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      ) : null}
+
+      <div className="surface-panel p-3">
+        {PRODUCT_FILTERS.map((category, index) => {
+          const isOpen = openSection === category.id;
+
+          return (
+            <div
+              key={category.id}
+              className={cn(
+                "overflow-hidden rounded-[24px] border border-transparent transition-colors",
+                index > 0 && "mt-3",
+                isOpen ? "border-brand/10 bg-brand/4" : "hover:border-[#171d29]/8",
+              )}
+            >
+              <button
+                type="button"
+                onClick={() => setOpenSection(isOpen ? null : category.id)}
+                className="flex w-full items-center justify-between px-4 py-4 text-left"
+              >
+                <div>
+                  <p
+                    className={cn(
+                      "text-base font-semibold transition-colors",
+                      isOpen ? "text-brand" : "text-ink",
+                    )}
+                  >
+                    {category.label}
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-stone">
+                    {category.description}
+                  </p>
+                </div>
+                <ChevronDown
+                  className={cn(
+                    "h-5 w-5 shrink-0 text-stone transition-transform duration-300",
+                    isOpen && "rotate-180 text-brand",
+                  )}
+                />
+              </button>
+
+              <AnimatePresence initial={false}>
+                {isOpen ? (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25, ease: "easeInOut" }}
+                    className="overflow-hidden"
+                  >
+                    <div className="space-y-2 px-4 pb-4">
                       <button
-                        key={sub}
-                        onClick={() => handleFilterClick(category.id, sub)}
+                        type="button"
+                        onClick={() => handleFilterClick(category.id)}
                         className={cn(
-                          "flex items-center gap-2 text-sm transition-colors text-left",
-                          activeFilter?.subcategory === sub 
-                            ? "text-[#B11116] font-medium" 
-                            : "text-[#64748B] hover:text-[#1C1C1C]"
+                          "flex w-full items-center justify-between rounded-[18px] px-4 py-3 text-sm font-medium transition-all",
+                          activeFilter?.category === category.id &&
+                            !activeFilter?.subcategory
+                            ? "bg-brand text-white shadow-[0_14px_28px_rgba(170,27,31,0.2)]"
+                            : "bg-white text-ink hover:bg-sand/80",
                         )}
                       >
-                        <div className={cn(
-                          "w-1.5 h-1.5 rounded-full transition-colors",
-                          activeFilter?.subcategory === sub ? "bg-[#B11116]" : "bg-[#E2E8F0]"
-                        )} />
-                        {sub}
+                        <span>Todos da linha</span>
+                        <span className="text-[11px] uppercase tracking-[0.2em]">
+                          Ver
+                        </span>
                       </button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        ))}
+
+                      <div className="grid gap-2">
+                        {category.subcategories.map((subcategory) => (
+                          <button
+                            key={subcategory}
+                            type="button"
+                            onClick={() =>
+                              handleFilterClick(category.id, subcategory)
+                            }
+                            className={cn(
+                              "rounded-[18px] border px-4 py-3 text-left text-sm transition-all",
+                              activeFilter?.subcategory === subcategory
+                                ? "border-brand/20 bg-brand/8 text-brand"
+                                : "border-[#171d29]/8 bg-white/70 text-stone hover:border-brand/14 hover:text-ink",
+                            )}
+                          >
+                            {subcategory}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                ) : null}
+              </AnimatePresence>
+            </div>
+          );
+        })}
       </div>
     </aside>
   );
