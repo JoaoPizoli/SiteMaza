@@ -154,6 +154,100 @@
   background-size: 28px 28px;
 }
 
+/* Leaflet store locator */
+.leaflet-container {
+  font-family: var(--font-roboto), Arial, sans-serif;
+  background: #F1F1EA;
+}
+
+.leaflet-control-attribution,
+.leaflet-control-zoom a {
+  font-family: var(--font-roboto), Arial, sans-serif;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 24px 70px -36px rgba(28, 28, 28, 0.72);
+}
+
+.leaflet-popup-content {
+  margin: 16px;
+}
+
+.maza-map-marker-shell {
+  background: transparent;
+  border: 0;
+}
+
+.maza-map-marker {
+  align-items: center;
+  background: #FFFFFF;
+  border: 3px solid #B11116;
+  border-radius: 999px 999px 999px 4px;
+  box-shadow: 0 16px 30px -16px rgba(28, 28, 28, 0.8);
+  color: #B11116;
+  display: flex;
+  height: 36px;
+  justify-content: center;
+  transform: rotate(-45deg);
+  transition: transform 180ms ease, background-color 180ms ease, color 180ms ease;
+  width: 36px;
+}
+
+.maza-map-marker span {
+  display: block;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1;
+  transform: rotate(45deg);
+}
+
+.maza-map-marker--active {
+  background: #B11116;
+  color: #FFFFFF;
+  transform: rotate(-45deg) scale(1.12);
+}
+
+.maza-user-marker {
+  align-items: center;
+  background: rgba(177, 17, 22, 0.18);
+  border-radius: 999px;
+  display: flex;
+  height: 28px;
+  justify-content: center;
+  position: relative;
+  width: 28px;
+}
+
+.maza-user-marker::before {
+  animation: maza-user-pulse 1.8s ease-out infinite;
+  border: 1px solid rgba(177, 17, 22, 0.45);
+  border-radius: inherit;
+  content: "";
+  inset: -8px;
+  position: absolute;
+}
+
+.maza-user-marker span {
+  background: #B11116;
+  border: 3px solid #FFFFFF;
+  border-radius: inherit;
+  box-shadow: 0 12px 28px -14px rgba(28, 28, 28, 0.85);
+  height: 16px;
+  width: 16px;
+}
+
+@keyframes maza-user-pulse {
+  from {
+    opacity: 0.65;
+    transform: scale(0.72);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
 /* Acessibilidade: respeita usuários que desabilitam movimento */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
