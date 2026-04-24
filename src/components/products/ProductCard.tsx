@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
@@ -23,6 +21,7 @@ export function ProductCard({ image, category, description, href }: ProductCardP
           src={image}
           alt={category}
           fill
+          sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw"
           className="object-cover"
         />
       </div>

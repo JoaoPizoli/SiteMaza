@@ -173,7 +173,6 @@ export default function AboutPage() {
               fill
               sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"
-              priority
             />
             <div
               aria-hidden
@@ -384,7 +383,7 @@ export default function AboutPage() {
                 className="group flex flex-col gap-4 p-6 bg-[#FCFCF7] border border-[#EBEBEB] rounded-2xl hover:border-[#B11116]/30 hover:shadow-[0_20px_50px_-20px_rgba(177,17,22,0.2)] hover:-translate-y-1 transition-all duration-500"
               >
                 <div className="relative flex-shrink-0" style={{ width: c.w, height: c.h }}>
-                  <Image src={c.src} alt={c.name} fill className="object-contain grayscale group-hover:grayscale-0 transition-all duration-500" />
+                  <Image src={c.src} alt={c.name} fill sizes={`${c.w}px`} className="object-contain grayscale group-hover:grayscale-0 transition-all duration-500" />
                 </div>
                 <div className="flex flex-col gap-2 pt-2 border-t border-[#EBEBEB]">
                   <h3 className="font-bold text-[15px] text-[#1C1C1C]">{c.name}</h3>

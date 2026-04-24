@@ -61,7 +61,7 @@ function ProductsContent() {
     setFilteredProducts(filtered);
   };
 
-  const handleFilterChange = (category: string, subcategory?: string) => {
+  const handleFilterChange = (category: string) => {
     // In a real app, this would filter by category ID or slug
     // For now, we'll just filter by string match if category matches
     if (!category) {
@@ -81,7 +81,7 @@ function ProductsContent() {
   };
 
   const handleSortChange = (option: string) => {
-    let sorted = [...filteredProducts];
+    const sorted = [...filteredProducts];
     if (option === "Nome (A-Z)") {
       sorted.sort((a, b) => a.title.localeCompare(b.title));
     } else if (option === "Nome (Z-A)") {

@@ -124,7 +124,7 @@ export function ProductsSection() {
         <div className="flex justify-center items-center gap-10 lg:gap-16 flex-wrap grayscale opacity-70 hover:opacity-100 hover:grayscale-0 transition-all duration-500">
           {CERTIFICATES.map((c) => (
             <div key={c.src} className="relative transition-transform hover:scale-110 duration-300" style={{ width: c.w, height: c.h }}>
-              <Image src={c.src} alt="" fill className="object-contain" />
+              <Image src={c.src} alt="" fill sizes={`${c.w}px`} className="object-contain" />
             </div>
           ))}
         </div>
@@ -152,7 +152,7 @@ function ProductCard({ title, icon, image, href, desc }: ProductCardProps) {
           src={image}
           alt={title}
           fill
-          sizes="(min-width: 768px) 50vw, 100vw"
+          sizes="(min-width: 1440px) 680px, (min-width: 768px) 50vw, 100vw"
           className="object-cover transition-transform duration-700 group-hover:scale-[1.08]"
         />
         {/* Overlay gradiente */}
