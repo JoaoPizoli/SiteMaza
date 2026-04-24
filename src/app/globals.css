@@ -81,7 +81,86 @@
   * {
     @apply border-border;
   }
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  ::selection {
+    background-color: #B11116;
+    color: #FFFFFF;
+  }
+  :focus-visible {
+    outline: 2px solid #FBB943;
+    outline-offset: 2px;
+    border-radius: 4px;
   }
 }
+
+/* ----- Marca Maza ----- */
+:root {
+  --maza-red: #B11116;
+  --maza-red-dark: #7a0b0f;
+  --maza-red-deep: #A00010;
+  --maza-gold: #FBB943;
+  --maza-gold-soft: #FFD996;
+  --maza-ink: #1C1C1C;
+  --maza-paper: #FCFCF7;
+  --maza-mist: #F1F1EA;
+
+  --shadow-soft: 0 10px 40px -12px rgba(28, 28, 28, 0.18);
+  --shadow-brand: 0 20px 60px -20px rgba(177, 17, 22, 0.45);
+}
+
+/* Gradiente animado usado no novo Hero sem imagem de fundo */
+@keyframes maza-mesh-shift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(2%, -2%, 0) scale(1.05); }
+}
+
+@keyframes maza-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-14px) rotate(3deg); }
+}
+
+@keyframes maza-shine {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes maza-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-maza-mesh  { animation: maza-mesh-shift 18s ease-in-out infinite; }
+.animate-maza-float { animation: maza-float 6s ease-in-out infinite; }
+.animate-maza-shine {
+  background-image: linear-gradient(100deg, transparent 20%, rgba(255,255,255,.35) 50%, transparent 80%);
+  background-size: 200% 100%;
+  animation: maza-shine 3.5s linear infinite;
+}
+.animate-maza-in    { animation: maza-fade-in .6s ease-out both; }
+
+/* Grid sutil de pontos (usado no Hero) */
+.bg-maza-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Acessibilidade: respeita usuários que desabilitam movimento */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

@@ -2,139 +2,262 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
-import { Menu } from "lucide-react";
-import { AnimatePresence } from "framer-motion";
-import { MobileMenu } from "./MobileMenu";
-
+import { useEffect, useState } from "react";
+import { Menu, MapPin, User, Search, ChevronDown } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
+import { MobileMenu } from "./MobileMenu";
 import { cn } from "@/lib/utils";
+
+type NavItem = {
+  label: string;
+  href: string;
+  children?: { label: string; href: string; description?: string }[];
+};
+
+const NAV_ITEMS: NavItem[] = [
+  { label: "Sobre a Maza", href: "/sobre" },
+  {
+    label: "Linha de produtos",
+    href: "/produtos",
+    children: [
+      { label: "Imobiliária", href: "/produtos?category=imobiliaria", description: "Tintas para residências e comércios" },
+      { label: "Automotiva", href: "/produtos?category=automotiva", description: "Alta performance e acabamento" },
+      { label: "Industrial", href: "/produtos?category=industrial", description: "Proteção para ambientes severos" },
+      { label: "Impermeabilizantes", href: "/produtos?category=impermeabilizantes", description: "Proteção contra umidade" },
+    ],
+  },
+  { label: "Representantes", href: "/onde-encontrar" },
+];
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const pathname = usePathname();
-  const isDarkText = pathname === "/sobre" || pathname?.startsWith("/produtos") || pathname?.startsWith("/produto");
-  
-  const logoSrc = isDarkText ? "/assets/figma/logo-maza.svg" : "/assets/navbar/logo-maza.png";
-  const textColor = isDarkText ? "text-[#1C1C1C]" : "text-white";
-  const hoverColor = isDarkText ? "hover:text-black" : "hover:text-white/80";
-  const borderColor = isDarkText ? "border-[#1C1C1C]/20" : "border-white/20";
-  const iconFilter = isDarkText ? "brightness(0)" : "";
+
+  // Páginas com conteúdo claro abaixo precisam de nav escura desde o topo.
+  const isLightPage =
+    pathname === "/sobre" ||
+    pathname?.startsWith("/produtos") ||
+    pathname?.startsWith("/produto");
+
+  // Aparência: escura quando scroll OU em página clara
+  const solid = isScrolled || isLightPage;
+
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const logoSrc = solid
+    ? "/assets/figma/logo-maza.svg"
+    : "/assets/navbar/logo-maza.png";
 
   return (
     <>
-      <nav className="absolute top-0 left-0 w-full z-50 flex justify-center">
-        <div className="w-full max-w-[1440px] h-[101px] py-6 flex justify-between items-center px-6 xl:px-0">
-          {/* Logo Area */}
-          <Link href="/" className="flex-shrink-0">
+      <motion.header
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className={cn(
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+          solid
+            ? "bg-white/85 backdrop-blur-xl shadow-[0_1px_0_0_rgba(0,0,0,0.06),0_10px_30px_-15px_rgba(0,0,0,0.18)]"
+            : "bg-transparent"
+        )}
+      >
+        <nav
+          aria-label="Principal"
+          className="mx-auto w-full max-w-[1440px] px-6 xl:px-10 h-[76px] lg:h-[88px] flex items-center justify-between gap-6"
+        >
+          {/* Logo */}
+          <Link
+            href="/"
+            aria-label="Página inicial Tintas Maza"
+            className="flex-shrink-0 group"
+          >
             <Image
               src={logoSrc}
-              alt="Maza Logo"
-              width={125}
-              height={71}
+              alt="Tintas Maza"
+              width={120}
+              height={68}
               priority
-              className="object-cover"
+              className="object-contain h-10 lg:h-12 w-auto transition-transform duration-300 group-hover:scale-[1.03]"
             />
           </Link>
-          
-          {/* Mobile Menu Button */}
-          <button 
-            className={cn("lg:hidden p-2 transition-opacity hover:opacity-80", textColor)}
-            onClick={() => setIsMenuOpen(true)}
-            aria-label="Open menu"
-          >
-            <Menu size={32} />
-          </button>
-          
-          {/* Content Area */}
-          <div className="hidden lg:flex items-center gap-6 justify-end">
-          {/* Nav Items 1 */}
-          <div className="flex items-center gap-6">
-            <Link href="/sobre" className={cn("font-medium text-base leading-[1.5em] transition-opacity hover:opacity-80", textColor)}>
-              Sobre a Maza
-            </Link>
-            
-            <Link href="/produtos" className="flex items-center gap-1 group">
-              <span className={cn("font-medium text-base leading-[1.5em] transition-opacity group-hover:opacity-80", textColor)}>
-                Linha de produtos
-              </span>
-              <Image
-                src="/assets/navbar/corner-right-down.svg"
-                alt="Arrow"
-                width={18}
-                height={18}
-                style={{ filter: iconFilter }}
-              />
-            </Link>
-            
-            <Link href="/onde-encontrar" className={cn("font-normal text-base leading-[1.5em] transition-opacity hover:opacity-80", textColor)}>
-              Representantes
-            </Link>
-          </div>
 
-          {/* Divisor */}
-          <div className={cn("w-px h-8 rounded", isDarkText ? "bg-[#1C1C1C]/20" : "bg-white/20")}></div>
+          {/* Links desktop */}
+          <ul className="hidden lg:flex items-center gap-1">
+            {NAV_ITEMS.map((item) => {
+              const active =
+                pathname === item.href ||
+                (item.href !== "/" && pathname?.startsWith(item.href));
+              const hasChildren = !!item.children?.length;
 
-          {/* Nav Items 2 */}
-          <div className="flex items-center gap-4">
-            <Link 
-              href="/onde-encontrar" 
-              className={cn("flex items-center gap-1 p-1 pr-3 bg-[rgba(177,17,22,0.2)] border border-[rgba(255,181,189,0.3)] backdrop-blur-[87.7px] rounded hover:bg-[rgba(177,17,22,0.3)] transition-colors",
-                isDarkText ? "text-[#1C1C1C]" : "text-[#FFC9CB]"
+              return (
+                <li
+                  key={item.href}
+                  className="relative"
+                  onMouseEnter={() =>
+                    hasChildren && setOpenDropdown(item.href)
+                  }
+                  onMouseLeave={() =>
+                    hasChildren && setOpenDropdown((v) => (v === item.href ? null : v))
+                  }
+                >
+                  <Link
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    aria-expanded={
+                      hasChildren ? openDropdown === item.href : undefined
+                    }
+                    className={cn(
+                      "group relative inline-flex items-center gap-1 px-3 py-2 rounded-md text-[15px] font-medium transition-colors",
+                      solid
+                        ? "text-[#1C1C1C] hover:text-[#B11116]"
+                        : "text-white/90 hover:text-white"
+                    )}
+                  >
+                    <span>{item.label}</span>
+                    {hasChildren && (
+                      <ChevronDown
+                        className={cn(
+                          "w-4 h-4 transition-transform duration-300",
+                          openDropdown === item.href && "rotate-180"
+                        )}
+                        aria-hidden
+                      />
+                    )}
+                    <span
+                      aria-hidden
+                      className={cn(
+                        "absolute left-3 right-3 -bottom-0.5 h-[2px] origin-left rounded-full transition-transform duration-300",
+                        solid ? "bg-[#B11116]" : "bg-[#FBB943]",
+                        active
+                          ? "scale-x-100"
+                          : "scale-x-0 group-hover:scale-x-100"
+                      )}
+                    />
+                  </Link>
+
+                  {/* Dropdown */}
+                  {hasChildren && (
+                    <AnimatePresence>
+                      {openDropdown === item.href && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 8 }}
+                          transition={{ duration: 0.18, ease: "easeOut" }}
+                          className="absolute left-0 top-full pt-3 w-[340px]"
+                        >
+                          <div className="rounded-2xl border border-black/5 bg-white shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] overflow-hidden">
+                            <ul className="p-2">
+                              {item.children!.map((c) => (
+                                <li key={c.href}>
+                                  <Link
+                                    href={c.href}
+                                    onClick={() => setOpenDropdown(null)}
+                                    className="flex flex-col gap-0.5 px-3 py-2.5 rounded-xl hover:bg-[#B11116]/5 transition-colors group/link"
+                                  >
+                                    <span className="text-[14px] font-semibold text-[#1C1C1C] group-hover/link:text-[#B11116]">
+                                      {c.label}
+                                    </span>
+                                    {c.description && (
+                                      <span className="text-[12px] text-[#1C1C1C]/60">
+                                        {c.description}
+                                      </span>
+                                    )}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+
+          {/* Ações à direita */}
+          <div className="hidden lg:flex items-center gap-2">
+            <Link
+              href="/onde-encontrar"
+              className={cn(
+                "inline-flex items-center gap-2 h-10 px-4 rounded-full text-[14px] font-medium transition-all",
+                solid
+                  ? "bg-[#B11116]/8 text-[#B11116] hover:bg-[#B11116]/15 border border-[#B11116]/15"
+                  : "bg-white/10 text-white hover:bg-white/20 border border-white/20 backdrop-blur-md"
               )}
             >
-              <div className="w-[17px] h-[18px] flex items-center justify-center">
-                <Image
-                  src="/assets/navbar/map-pin.svg"
-                  alt="Map Pin"
-                  width={17}
-                  height={18}
-                  style={{ filter: isDarkText ? "brightness(0)" : "" }}
-                />
-              </div>
-              <span className="font-normal text-base leading-[1.5em]">Onde encontrar</span>
+              <MapPin className="w-4 h-4" aria-hidden />
+              <span>Onde encontrar</span>
             </Link>
 
-            <Link 
-              href="/area-cliente" 
-              className="flex items-center gap-1 p-1 pr-3 bg-[rgba(251,185,67,0.2)] border border-[rgba(255,217,150,0.3)] backdrop-blur-[87.7px] rounded text-[#FBB943] hover:bg-[rgba(251,185,67,0.3)] transition-colors"
+            <Link
+              href="/area-cliente"
+              className={cn(
+                "inline-flex items-center gap-2 h-10 px-4 rounded-full text-[14px] font-semibold transition-all shadow-sm",
+                solid
+                  ? "bg-[#FBB943] text-[#1C1C1C] hover:bg-[#ffca68]"
+                  : "bg-[#FBB943] text-[#1C1C1C] hover:bg-[#ffca68]"
+              )}
             >
-              <div className="w-[18px] h-[18px] flex items-center justify-center">
-                 <Image
-                  src="/assets/navbar/user.svg"
-                  alt="User"
-                  width={18}
-                  height={18}
-                />
-              </div>
-              <span className="font-normal text-base leading-[1.5em]">Área do cliente</span>
+              <User className="w-4 h-4" aria-hidden />
+              <span>Área do cliente</span>
             </Link>
+
+            <button
+              type="button"
+              aria-label="Buscar"
+              className={cn(
+                "inline-flex items-center justify-center w-10 h-10 rounded-full transition-colors",
+                solid
+                  ? "text-[#1C1C1C] hover:bg-[#1C1C1C]/5"
+                  : "text-white hover:bg-white/10"
+              )}
+            >
+              <Search className="w-5 h-5" aria-hidden />
+            </button>
           </div>
 
-          {/* Search Button */}
-          <button 
-            className={cn("flex items-center justify-center w-8 h-8 p-1 rounded transition-colors", 
-              isDarkText ? "bg-[#1C1C1C]/10 border border-[#1C1C1C]/20 hover:bg-[#1C1C1C]/20" : "bg-[rgba(241,241,234,0.2)] border border-[rgba(185,185,185,0.3)] hover:bg-[rgba(241,241,234,0.3)]"
+          {/* Botão mobile */}
+          <button
+            type="button"
+            aria-label="Abrir menu"
+            aria-expanded={isMenuOpen}
+            onClick={() => setIsMenuOpen(true)}
+            className={cn(
+              "lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-full transition-colors",
+              solid
+                ? "text-[#1C1C1C] hover:bg-[#1C1C1C]/5"
+                : "text-white hover:bg-white/10"
             )}
-            aria-label="Search"
           >
-            <Image
-              src="/assets/navbar/search-icon.svg"
-              alt="Search"
-              width={24}
-              height={24}
-              className="object-cover"
-            />
+            <Menu className="w-6 h-6" />
           </button>
-        </div>
-      </div>
-    </nav>
+        </nav>
+
+        {/* Linha inferior sutil quando solid */}
+        <div
+          aria-hidden
+          className={cn(
+            "h-px w-full transition-opacity duration-300",
+            solid ? "opacity-100 bg-black/5" : "opacity-0"
+          )}
+        />
+      </motion.header>
+
       <AnimatePresence>
         {isMenuOpen && <MobileMenu onClose={() => setIsMenuOpen(false)} />}
       </AnimatePresence>
     </>
   );
 }
-
-// Remove unused NavLink component or keep it if needed elsewhere (but here we replaced it)
 

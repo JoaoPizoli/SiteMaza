@@ -1,27 +1,16 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import Image from "next/image";
 import { motion, Variants } from "framer-motion";
-
-const findUsItem = {
-  title: "Procurando a Maza perto de você?",
-  icon: "/assets/home/find-us/location-icon.svg",
-  buttons: [
-    { text: "VER LOJAS", href: "#" },
-    { text: "VER REPRESENTANTES", href: "#" }
-  ]
-};
+import { MapPin, Users, ArrowUpRight } from "lucide-react";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.2,
-      delayChildren: 0.1,
-    },
+    transition: { staggerChildren: 0.15, delayChildren: 0.1 },
   },
 };
 
@@ -30,130 +19,104 @@ const itemVariants: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: "easeOut" },
-  },
-};
-
-const iconVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.5, y: -20 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: { 
-      type: "spring",
-      stiffness: 200,
-      damping: 15,
-      delay: 0.2 
-    },
-  },
-};
-
-const bgLeftVariants: Variants = {
-  hidden: { opacity: 0, x: -50 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: { duration: 0.8, ease: "easeOut" },
-  },
-};
-
-const bgRightVariants: Variants = {
-  hidden: { opacity: 0, x: 50 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: { duration: 0.8, ease: "easeOut" },
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
 export function FindUsSection() {
   return (
-    <section className="w-full flex justify-center py-[80px] px-4 md:px-0 relative">
-      <motion.div 
-        className="w-full max-w-[1216px] relative"
+    <section className="w-full flex justify-center py-20 lg:py-24">
+      <motion.div
+        className="w-full relative"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
         variants={containerVariants}
       >
-        <div className="relative pt-[32px]"> {/* Padding for floating icon */}
-          
-          {/* Floating Icon */}
-          <motion.div 
-            variants={iconVariants}
-            className="absolute left-1/2 -translate-x-1/2 top-0 z-20 flex items-center justify-center bg-white rounded-[8px] shadow-[0px_4px_60px_0px_rgba(160,0,16,0.3)] w-[64px] h-[64px] overflow-hidden"
+        <div className="relative pt-10">
+          {/* Ícone flutuante */}
+          <motion.div
+            variants={itemVariants}
+            className="absolute left-1/2 -translate-x-1/2 top-0 z-20 flex items-center justify-center bg-white rounded-2xl shadow-[0_20px_60px_-20px_rgba(177,17,22,0.45)] w-20 h-20 border border-black/5"
           >
-            <div className="w-[192px] h-[192px] flex items-center justify-center -m-[64px]">
-              <Image 
-                src={findUsItem.icon}
-                alt="Location Icon" 
-                width={192} 
-                height={192} 
-                className="w-full h-full object-cover"
-              />
-            </div>
+            <MapPin className="w-9 h-9 text-[#B11116]" aria-hidden />
           </motion.div>
 
-          {/* Main Content Card */}
-          <div 
-            className="w-full relative overflow-hidden rounded-[8px] p-[40px] flex flex-col items-center justify-center text-center gap-[40px]"
+          {/* Card principal */}
+          <div
+            className="w-full relative overflow-hidden px-6 md:px-12 py-16 lg:py-20 flex flex-col items-center justify-center text-center gap-10"
             style={{
-              background: "linear-gradient(130deg, #B11116 1%, #8D1317 79%)",
+              background:
+                "linear-gradient(135deg, #B11116 0%, #8D1317 45%, #5a0a0d 100%)",
             }}
           >
-            {/* Background Vectors */}
-            <motion.div 
-              variants={bgLeftVariants}
-              className="absolute top-[-97px] left-[-131px] pointer-events-none select-none"
-            >
-              <Image 
-                src="/assets/home/find-us/vector-bg-left.svg" 
-                alt="Background Vector Left" 
-                width={342} 
-                height={297} 
+            {/* Decorativos animados */}
+            <motion.div
+              aria-hidden
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.9, ease: "easeOut" }}
+              className="absolute -top-24 -left-24 w-80 h-80 rounded-full blur-3xl opacity-60 pointer-events-none"
+              style={{ background: "radial-gradient(circle, rgba(251,185,67,0.5) 0%, transparent 70%)" }}
+            />
+            <motion.div
+              aria-hidden
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.9, ease: "easeOut", delay: 0.1 }}
+              className="absolute -bottom-20 -right-20 w-72 h-72 rounded-full blur-3xl opacity-50 pointer-events-none"
+              style={{ background: "radial-gradient(circle, rgba(255,255,255,0.25) 0%, transparent 70%)" }}
+            />
+            <div aria-hidden className="absolute inset-0 bg-maza-grid opacity-25" />
+            {/* SVGs originais (se existirem) como camada sutil */}
+            <div aria-hidden className="absolute top-0 left-0 opacity-40 pointer-events-none select-none">
+              <Image
+                src="/assets/home/find-us/vector-bg-left.svg"
+                alt=""
+                width={320}
+                height={280}
               />
-            </motion.div>
-            
-            <motion.div 
-              variants={bgRightVariants}
-              className="absolute top-[61px] right-[-457px] md:right-[-200px] lg:left-[872px] pointer-events-none select-none"
-            >
-              <Image 
-                src="/assets/home/find-us/vector-bg-right.svg" 
-                alt="Background Vector Right" 
-                width={401} 
-                height={141} 
-              />
-            </motion.div>
-
-            {/* Content */}
-            <div className="flex flex-col gap-[40px] z-10 items-center">
-              
-              {/* Text */}
-              <motion.div variants={itemVariants} className="flex flex-col gap-[24px]">
-                <h2 className="font-roboto font-semibold text-[31px] leading-[1.4em] text-[#F1F5F9]">
-                  {findUsItem.title}
-                </h2>
-              </motion.div>
-
-              {/* Buttons */}
-              <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-[24px]">
-                {findUsItem.buttons.map((btn, index) => (
-                  <Button 
-                    key={index}
-                    variant="outline"
-                    className="bg-white hover:bg-gray-100 text-[#1C1C1C] border-[4px] border-[rgba(227,227,227,0.5)] rounded-[50px] px-[32px] py-[16px] h-auto font-roboto font-semibold text-[17px] leading-[1.5em] tracking-[0.03em] cursor-pointer transition-transform hover:scale-105 active:scale-95 duration-200"
-                  >
-                    {btn.text}
-                  </Button>
-                ))}
-              </motion.div>
             </div>
 
+            <motion.div variants={itemVariants} className="relative z-10 flex flex-col gap-6 items-center max-w-[680px]">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md">
+                <span className="text-[11px] tracking-[0.14em] font-black text-[#FBB943]">
+                  EM TODO O BRASIL
+                </span>
+              </div>
+              <h2 className="font-roboto font-bold text-white text-[32px] md:text-[44px] leading-[1.1] tracking-[-0.01em]">
+                Procurando a Maza perto de você?
+              </h2>
+              <p className="text-white/80 text-[16px] leading-relaxed max-w-[520px]">
+                Encontre representantes e lojas físicas em sua região. Presença nacional com qualidade garantida.
+              </p>
+            </motion.div>
+
+            <motion.div variants={itemVariants} className="relative z-10 flex flex-col sm:flex-row gap-4">
+              <Link
+                href="/onde-encontrar"
+                className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-white text-[#1C1C1C] font-semibold text-[14px] tracking-[0.03em] hover:bg-[#FBB943] transition-colors shadow-xl"
+              >
+                <MapPin className="w-4 h-4" aria-hidden />
+                <span>VER LOJAS</span>
+                <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
+              </Link>
+
+              <Link
+                href="/onde-encontrar"
+                className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-white/10 border border-white/25 backdrop-blur-md text-white font-semibold text-[14px] tracking-[0.03em] hover:bg-white/20 transition-colors"
+              >
+                <Users className="w-4 h-4" aria-hidden />
+                <span>VER REPRESENTANTES</span>
+                <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
+              </Link>
+            </motion.div>
           </div>
         </div>
       </motion.div>
     </section>
   );
 }
+

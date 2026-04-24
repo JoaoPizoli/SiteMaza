@@ -2,148 +2,158 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { X } from "lucide-react";
-import { motion } from "framer-motion";
+import { useEffect } from "react";
+import { X, MapPin, User, Search, ArrowUpRight } from "lucide-react";
+import { motion, Variants } from "framer-motion";
 
 interface MobileMenuProps {
   onClose: () => void;
 }
 
+const NAV_LINKS: { label: string; href: string }[] = [
+  { label: "Início", href: "/" },
+  { label: "Sobre a Maza", href: "/sobre" },
+  { label: "Linha de produtos", href: "/produtos" },
+  { label: "Onde encontrar", href: "/onde-encontrar" },
+  { label: "Representantes", href: "/onde-encontrar" },
+];
+
+const listVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05, delayChildren: 0.15 } },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, x: 24 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.35, ease: "easeOut" } },
+};
+
 export function MobileMenu({ onClose }: MobileMenuProps) {
+  // Bloqueia scroll do body + fecha com ESC
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
+
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
+    <div
+      className="fixed inset-0 z-[60] flex justify-end"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Menu de navegação"
+    >
       {/* Backdrop */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        transition={{ duration: 0.25 }}
+        className="absolute inset-0 bg-[#1C1C1C]/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Menu Content */}
-      <motion.div 
+      {/* Painel */}
+      <motion.aside
         initial={{ x: "100%" }}
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="relative w-[338px] h-full bg-[rgba(0,0,0,0.1)] backdrop-blur-[68.7px] flex flex-col p-3 gap-6 overflow-y-auto border-l border-white/10 shadow-2xl"
+        transition={{ type: "spring", stiffness: 320, damping: 34 }}
+        className="relative w-[88%] max-w-[380px] h-full bg-gradient-to-b from-[#1C1C1C] via-[#2a0a0b] to-[#1C1C1C] text-white flex flex-col overflow-y-auto shadow-[0_0_60px_-10px_rgba(0,0,0,0.6)]"
       >
-        
-        {/* Close Button */}
-        <button 
-          onClick={onClose}
-          className="absolute top-3 right-3 p-2 text-white hover:bg-white/10 rounded-full transition-colors"
-        >
-          <X size={24} />
-        </button>
-
-        <div className="flex flex-col gap-6 mt-12 px-3">
-          {/* Nav Items 1 */}
-          <div className="flex flex-col gap-2">
-            <Link 
-              href="/" 
-              onClick={onClose}
-              className="font-roboto font-normal text-base leading-[1.5em] text-white hover:opacity-80 transition-opacity py-2"
-            >
-              Início
-            </Link>
-            
-            <Link 
-              href="/sobre" 
-              onClick={onClose}
-              className="font-roboto font-normal text-base leading-[1.5em] text-white hover:opacity-80 transition-opacity py-2"
-            >
-              Sobre a Maza
-            </Link>
-            
-            <Link 
-              href="/produtos" 
-              onClick={onClose}
-              className="flex items-center gap-1 py-2 group"
-            >
-              <span className="font-roboto font-normal text-base leading-[1.5em] text-white group-hover:opacity-80 transition-opacity">
-                Linha de produtos
-              </span>
-              <div className="w-4 h-4 flex items-center justify-center">
-                <Image
-                  src="/assets/navbar/corner-right-down.svg"
-                  alt="Arrow"
-                  width={16}
-                  height={16}
-                />
-              </div>
-            </Link>
-            
-            <Link 
-              href="/onde-encontrar" 
-              onClick={onClose}
-              className="font-roboto font-normal text-base leading-[1.5em] text-white hover:opacity-80 transition-opacity py-2"
-            >
-              Onde encontrar
-            </Link>
-            
-            <Link 
-              href="/representantes" 
-              onClick={onClose}
-              className="font-roboto font-normal text-base leading-[1.5em] text-white hover:opacity-80 transition-opacity py-2"
-            >
-              Representantes
-            </Link>
-          </div>
-
-          {/* Nav Items 2 (Buttons) */}
-          <div className="flex flex-col gap-4">
-            <Link 
-              href="/onde-encontrar" 
-              onClick={onClose}
-              className="flex items-center gap-1 p-1 pr-3 bg-[rgba(177,17,22,0.2)] border border-[rgba(255,181,189,0.3)] backdrop-blur-[87.7px] rounded text-[#FFC9CB] hover:bg-[rgba(177,17,22,0.3)] transition-colors w-fit"
-            >
-              <div className="w-[17px] h-[18px] flex items-center justify-center p-1">
-                <Image
-                  src="/assets/navbar/map-pin.svg"
-                  alt="Map Pin"
-                  width={17}
-                  height={18}
-                />
-              </div>
-              <span className="font-roboto font-normal text-base leading-[1.5em]">Onde encontrar</span>
-            </Link>
-
-            <Link 
-              href="/area-cliente" 
-              onClick={onClose}
-              className="flex items-center gap-1 p-1 pr-3 bg-[rgba(251,185,67,0.2)] border border-[rgba(255,217,150,0.3)] backdrop-blur-[87.7px] rounded text-[#FBB943] hover:bg-[rgba(251,185,67,0.3)] transition-colors w-fit"
-            >
-              <div className="w-[18px] h-[18px] flex items-center justify-center p-1">
-                 <Image
-                  src="/assets/navbar/user.svg"
-                  alt="User"
-                  width={18}
-                  height={18}
-                />
-              </div>
-              <span className="font-roboto font-normal text-base leading-[1.5em]">Área do cliente</span>
-            </Link>
-
-            {/* Search Button */}
-            <button 
-              className="flex items-center justify-start gap-2.5 p-1 bg-[rgba(173,173,173,0.2)] border border-[rgba(21,21,21,0.3)] rounded hover:bg-[rgba(173,173,173,0.3)] transition-colors w-fit"
-              aria-label="Search"
-            >
-               <div className="w-6 h-6 flex items-center justify-center">
-                 <Image
-                  src="/assets/navbar/search-icon.svg"
-                  alt="Search"
-                  width={24}
-                  height={24}
-                />
-               </div>
-            </button>
-          </div>
+        {/* Header do painel */}
+        <div className="flex items-center justify-between px-6 h-[76px] border-b border-white/10">
+          <Link href="/" onClick={onClose} className="flex items-center">
+            <Image
+              src="/assets/navbar/logo-maza.png"
+              alt="Tintas Maza"
+              width={110}
+              height={60}
+              className="h-9 w-auto object-contain"
+            />
+          </Link>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fechar menu"
+            className="inline-flex items-center justify-center w-10 h-10 rounded-full text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+          >
+            <X className="w-5 h-5" aria-hidden />
+          </button>
         </div>
-      </motion.div>
+
+        {/* Conteúdo */}
+        <motion.div
+          variants={listVariants}
+          initial="hidden"
+          animate="visible"
+          className="flex-1 px-6 py-6 flex flex-col gap-8"
+        >
+          {/* Busca */}
+          <motion.label
+            variants={itemVariants}
+            className="flex items-center gap-3 h-12 px-4 rounded-full bg-white/5 border border-white/10 focus-within:border-[#FBB943]/60 transition-colors"
+          >
+            <Search className="w-4 h-4 text-white/60" aria-hidden />
+            <input
+              type="search"
+              placeholder="Buscar produtos..."
+              className="flex-1 bg-transparent outline-none text-[14px] placeholder:text-white/50"
+            />
+          </motion.label>
+
+          {/* Links principais */}
+          <nav aria-label="Navegação principal" className="flex flex-col">
+            {NAV_LINKS.map((l) => (
+              <motion.div key={l.label} variants={itemVariants}>
+                <Link
+                  href={l.href}
+                  onClick={onClose}
+                  className="group flex items-center justify-between py-3.5 border-b border-white/5 text-[17px] font-medium text-white/90 hover:text-white transition-colors"
+                >
+                  <span>{l.label}</span>
+                  <ArrowUpRight
+                    className="w-5 h-5 text-white/40 transition-all duration-300 group-hover:text-[#FBB943] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    aria-hidden
+                  />
+                </Link>
+              </motion.div>
+            ))}
+          </nav>
+
+          {/* CTAs */}
+          <motion.div variants={itemVariants} className="flex flex-col gap-3 mt-2">
+            <Link
+              href="/onde-encontrar"
+              onClick={onClose}
+              className="inline-flex items-center justify-center gap-2 h-12 rounded-full bg-white/5 border border-white/15 text-white hover:bg-white/10 transition-colors text-[14px] font-medium"
+            >
+              <MapPin className="w-4 h-4" aria-hidden />
+              <span>Onde encontrar</span>
+            </Link>
+
+            <Link
+              href="/area-cliente"
+              onClick={onClose}
+              className="inline-flex items-center justify-center gap-2 h-12 rounded-full bg-[#FBB943] text-[#1C1C1C] hover:bg-[#ffca68] transition-colors text-[14px] font-semibold shadow-[0_10px_30px_-10px_rgba(251,185,67,0.7)]"
+            >
+              <User className="w-4 h-4" aria-hidden />
+              <span>Área do cliente</span>
+            </Link>
+          </motion.div>
+        </motion.div>
+
+        {/* Rodapé do painel */}
+        <div className="px-6 py-5 border-t border-white/10 text-[12px] text-white/50">
+          © {new Date().getFullYear()} Tintas Maza — Paixão por qualidade.
+        </div>
+      </motion.aside>
     </div>
   );
 }
+
