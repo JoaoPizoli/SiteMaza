@@ -1,138 +1,112 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { ArrowUpRight, BadgeCheck, Paintbrush, ShieldHalf } from "lucide-react";
-
-const showcases = [
-  {
-    title: "Acabamento com leitura premium",
-    text: "Apresentacao mais sofisticada para demonstrar qualidade visual e confianca de aplicacao.",
-    image: "/assets/home/results/results-placeholder.png",
-    metric: "Cobertura uniforme",
-  },
-  {
-    title: "Linha industrial com mais autoridade",
-    text: "Cards e destaques reposicionados para comunicar tecnica, resistencia e desempenho.",
-    image: "/assets/figma/industrial.png",
-    metric: "Protecao duradoura",
-  },
-  {
-    title: "Fluxo automotivo mais comercial",
-    text: "Acesso a categorias, beneficios e detalhes com muito mais clareza de navegacao.",
-    image: "/assets/figma/automotivo.png",
-    metric: "Secagem controlada",
-  },
-];
-
-const benefits = [
-  {
-    title: "Mais premium",
-    icon: Paintbrush,
-    text: "Paleta, tipografia e espacamento agora reforcam uma percepcao mais madura de marca.",
-  },
-  {
-    title: "Mais claro",
-    icon: BadgeCheck,
-    text: "CTAs, seções e navegação foram reorganizados para destacar o que realmente importa.",
-  },
-  {
-    title: "Mais confiavel",
-    icon: ShieldHalf,
-    text: "A linguagem visual ficou mais consistente em todas as paginas do site.",
-  },
-];
+import { motion, Variants } from "framer-motion";
 
 export function ResultsSection() {
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
+      },
+    },
+  };
+
   return (
-    <section className="pb-10 md:pb-16">
-      <div className="site-container">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.65, ease: "easeOut" }}
-          className="grid gap-6 lg:grid-cols-[1.04fr_0.96fr]"
-        >
-          <div className="surface-panel p-8 md:p-10">
-            <span className="section-tag">Performance visual</span>
-            <h2 className="section-title mt-5 max-w-[11ch]">
-              Um site mais profissional tambem vende percepcao.
-            </h2>
-            <p className="section-copy mt-5 max-w-[56ch]">
-              O novo desenho organiza melhor a narrativa da marca, melhora o
-              ritmo visual e transforma seções antes genéricas em uma
-              apresentacao mais forte, mais atual e mais comercial.
-            </p>
+    <section className="w-full py-20 flex flex-col items-center justify-center bg-white overflow-hidden">
+      <motion.div
+        className="w-full max-w-[1440px] px-6 xl:px-0 flex flex-col items-center gap-10"
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+      >
+        {/* Header Content */}
+        <motion.div className="flex flex-col items-center gap-4 text-center max-w-[685px]" variants={itemVariants}>
+          {/* Pill Tag */}
+          <div className="flex items-center justify-center gap-[10px] px-2 py-1 rounded-[50px] bg-[rgba(251,185,67,0.2)] border border-[rgba(255,217,150,0.3)] backdrop-blur-[87.7px]">
+            <span className="font-roboto font-black text-[13px] leading-[1.5em] tracking-[0.12em] text-[#FBB943]">
+              GALERIA DE VÍDEOS
+            </span>
+          </div>
 
-            <div className="mt-8 grid gap-4">
-              {benefits.map((benefit) => {
-                const Icon = benefit.icon;
+          {/* Heading */}
+          <h2 className="font-roboto font-semibold text-[49px] leading-[1.4em] text-[#1C1C1C]">
+            Resultados que você pode ver.
+          </h2>
 
-                return (
-                  <div
-                    key={benefit.title}
-                    className="flex items-start gap-4 rounded-[24px] border border-[#171d29]/10 bg-sand/55 p-4"
-                  >
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand text-white">
-                      <Icon className="h-5 w-5" />
-                    </div>
+          {/* Description */}
+          <p className="font-roboto font-normal text-base leading-[1.5em] text-[#5F5F5A] max-w-[590px]">
+            Da preparação ao acabamento final, acompanhe a performance das tintas Maza em diferentes superfícies e aplicações.
+          </p>
+        </motion.div>
 
-                    <div>
-                      <h3 className="font-display text-xl text-ink">
-                        {benefit.title}
-                      </h3>
-                      <p className="mt-2 text-sm leading-7 text-stone">
-                        {benefit.text}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
+        {/* Carousel / Cards */}
+        <motion.div className="flex items-center justify-center gap-5 w-full" variants={itemVariants}>
+          {/* Left Arrow */}
+          <button className="w-10 h-10 flex items-center justify-center bg-[#F8FAFC] rounded-full shadow-[0_4px_60px_rgba(160,0,16,0.3),0_4px_60px_rgba(15,23,42,0.15)] hover:scale-110 transition-transform">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 18L9 12L15 6" stroke="#A00010" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+
+          {/* Cards Container */}
+          <div className="flex items-center gap-5">
+            {/* Left Card (Inactive) */}
+            <div className="relative w-[276px] h-[357px] rounded-lg overflow-hidden opacity-20">
+              <Image
+                src="/assets/home/results/results-placeholder.png"
+                alt="Result Video 1"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-black/10"></div>
+            </div>
+
+            {/* Center Card (Active) */}
+            <div className="relative w-[305px] h-[395px] rounded-lg overflow-hidden shadow-xl z-10">
+              <Image
+                src="/assets/home/results/results-placeholder.png"
+                alt="Result Video 2"
+                fill
+                className="object-cover"
+              />
+            </div>
+
+            {/* Right Card (Inactive) */}
+            <div className="relative w-[277px] h-[359px] rounded-lg overflow-hidden opacity-20">
+              <Image
+                src="/assets/home/results/results-placeholder.png"
+                alt="Result Video 3"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-black/10"></div>
             </div>
           </div>
 
-          <div className="grid gap-4">
-            {showcases.map((showcase) => (
-              <div
-                key={showcase.title}
-                className="group surface-panel relative overflow-hidden p-0"
-              >
-                <div className="grid min-h-[218px] gap-0 md:grid-cols-[0.92fr_1.08fr]">
-                  <div className="relative min-h-[220px]">
-                    <Image
-                      src={showcase.image}
-                      alt={showcase.title}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(18,22,32,0.04)_0%,rgba(18,22,32,0.34)_100%)]" />
-                  </div>
-
-                  <div className="flex flex-col justify-between p-6">
-                    <div>
-                      <span className="rounded-full border border-brand/12 bg-brand/8 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand">
-                        {showcase.metric}
-                      </span>
-                      <h3 className="mt-4 font-display text-2xl text-ink">
-                        {showcase.title}
-                      </h3>
-                      <p className="mt-3 text-sm leading-7 text-stone">
-                        {showcase.text}
-                      </p>
-                    </div>
-
-                    <div className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand">
-                      Visual renovado
-                      <ArrowUpRight className="h-4 w-4" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* Right Arrow */}
+          <button className="w-10 h-10 flex items-center justify-center bg-[#F8FAFC] rounded-full shadow-[0_4px_60px_rgba(160,0,16,0.3),0_4px_60px_rgba(15,23,42,0.15)] hover:scale-110 transition-transform">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="#A00010" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
         </motion.div>
-      </div>
+      </motion.div>
     </section>
   );
 }

@@ -3,175 +3,217 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, Variants } from "framer-motion";
-import { ArrowUpRight, Shield } from "lucide-react";
-import { Button } from "@/components/ui/button";
-
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.12,
-    },
-  },
-};
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.55, ease: "easeOut" },
-  },
-};
-
-const productLines = [
-  {
-    title: "Imobiliaria",
-    description:
-      "Tintas, massas e acabamentos para obras que pedem cobertura, leitura visual e rendimento comercial.",
-    image: "/assets/figma/imobiliaria.png",
-    href: "/produtos?category=imobiliaria",
-  },
-  {
-    title: "Automotiva",
-    description:
-      "Preparacao, repintura e protecao com foco em acabamento consistente e produtividade de oficina.",
-    image: "/assets/figma/automotivo.png",
-    href: "/produtos?category=automotiva",
-  },
-  {
-    title: "Industrial",
-    description:
-      "Solucoes para manutencao, estruturas e areas produtivas com resistencia e desempenho tecnico.",
-    image: "/assets/figma/industrial.png",
-    href: "/produtos?category=industrial",
-  },
-  {
-    title: "Impermeabilizantes",
-    description:
-      "Protecao contra umidade e infiltracao para obras que nao podem abrir mao de seguranca estrutural.",
-    image: "/assets/figma/impermeabilizantes.png",
-    href: "/produtos?category=impermeabilizantes",
-  },
-];
-
-const certificates = [
-  "/assets/certificates/certificate-1.png",
-  "/assets/certificates/certificate-2.png",
-  "/assets/certificates/certificate-3.png",
-  "/assets/certificates/certificate-4.png",
-  "/assets/certificates/certificate-5.png",
-];
 
 export function ProductsSection() {
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+      },
+    },
+  };
+
   return (
-    <section className="py-24 md:py-32">
+    <section className="w-full bg-white flex flex-col items-center justify-center py-40 gap-12">
       <motion.div
-        className="site-container"
+        className="w-full max-w-[1440px] px-6 xl:px-0 flex flex-col gap-12"
+        variants={containerVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
-        variants={containerVariants}
       >
-        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <motion.div variants={itemVariants} className="surface-panel p-8 md:p-10">
-            <span className="section-tag">Linhas de produtos</span>
-            <h2 className="section-title mt-5 max-w-[11ch]">
-              Um portfolio desenhado para vender melhor.
-            </h2>
-            <p className="section-copy mt-5 max-w-[55ch]">
-              Reorganizamos a apresentacao das linhas para destacar aplicacao,
-              desempenho e direcionamento comercial. O resultado e uma vitrine
-              mais premium, mais facil de navegar e muito mais profissional.
-            </p>
-
-            <div className="mt-8 space-y-4 rounded-[28px] border border-[#171d29]/10 bg-sand/70 p-5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand text-white">
-                  <Shield className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-ink">
-                    Certificados e processos em destaque
-                  </p>
-                  <p className="text-sm leading-6 text-stone">
-                    Apresentacao mais institucional para reforcar percepcao de
-                    qualidade e confiabilidade.
-                  </p>
-                </div>
+        {/* Header Row */}
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8 w-full">
+          {/* Left: Headings */}
+          <motion.div className="flex flex-col gap-8 w-full" variants={itemVariants}>
+            <div className="flex flex-col gap-2">
+              {/* Tag: Produtos */}
+              <div className="flex items-center justify-center gap-[10px] px-2 py-1 w-fit rounded-[50px] bg-[rgba(251,185,67,0.2)] border border-[rgba(255,217,150,0.3)] backdrop-blur-[87.7px]">
+                <span className="font-black text-[13px] leading-[1.5em] tracking-[0.12em] text-[#FBB943]">
+                  PRODUTOS
+                </span>
               </div>
-
-              <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
-                {certificates.map((certificate, index) => (
-                  <div
-                    key={certificate}
-                    className="flex h-[92px] items-center justify-center rounded-[22px] border border-[#171d29]/8 bg-white"
-                  >
-                    <div className="relative h-12 w-16">
-                      <Image
-                        src={certificate}
-                        alt={`Certificado ${index + 1}`}
-                        fill
-                        className="object-contain"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+              {/* H2 */}
+              <h2 className="font-roboto font-semibold text-[49px] leading-[1.4em] text-[#1C1C1C]"> 
+                Nossas linhas de produtos.
+              </h2>
             </div>
-
-            <Button asChild size="lg" className="mt-8">
-              <Link href="/produtos">Ver catalogo completo</Link>
-            </Button>
           </motion.div>
+        </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            {productLines.map((line) => (
-              <motion.div key={line.title} variants={itemVariants}>
-                <Link
-                  href={line.href}
-                  className="group relative block min-h-[340px] overflow-hidden rounded-[32px] border border-white/40 bg-ink"
-                >
-                  <div className="absolute inset-0">
-                    <Image
-                      src={line.image}
-                      alt={line.title}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(18,22,32,0.06)_0%,rgba(18,22,32,0.84)_100%)]" />
-                  </div>
+        {/* Bento Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+          {/* Card 1: Imobiliária */}
+          <ProductCard
+            title="Imobiliária"
+            icon="/assets/figma/icon-imobiliaria.svg"
+            image="/assets/figma/imobiliaria.png"
+            href="/produtos?category=imobiliaria&subcategory=Acabamentos"
+            variants={itemVariants}
+          />
 
-                  <div className="relative z-10 flex h-full flex-col justify-between p-6 md:p-7">
-                    <div className="flex items-start justify-between gap-4">
-                      <span className="rounded-full border border-white/12 bg-white/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/72">
-                        Linha especializada
-                      </span>
-                      <div className="flex h-11 w-11 items-center justify-center rounded-full border border-white/14 bg-white/10 text-white transition-transform duration-300 group-hover:-translate-y-1">
-                        <ArrowUpRight className="h-5 w-5" />
-                      </div>
-                    </div>
+          {/* Card 2: Automotivo */}
+          <ProductCard
+            title="Automotivo"
+            icon="/assets/figma/icon-automotivo.svg"
+            image="/assets/figma/automotivo.png"
+            href="/produtos?category=automotiva&subcategory=Adesivos"
+            variants={itemVariants}
+          />
 
-                    <div className="space-y-4">
-                      <h3 className="font-display text-3xl text-white">
-                        {line.title}
-                      </h3>
-                      <p className="max-w-[28ch] text-sm leading-7 text-white/74">
-                        {line.description}
-                      </p>
-                      <span className="inline-flex items-center gap-2 text-sm font-semibold text-gold">
-                        Ver produtos
-                        <ArrowUpRight className="h-4 w-4" />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
+          {/* Card 3: Industrial */}
+          <ProductCard
+            title="Industrial"
+            icon="/assets/figma/icon-industrial.svg"
+            image="/assets/figma/industrial.png"
+            href="/produtos?category=industrial&subcategory=Anticorrosivos"
+            variants={itemVariants}
+          />
+
+          {/* Card 4: Impermeabilizantes */}
+          <ProductCard
+            title="Impermeabilizantes"
+            icon="/assets/figma/icon-impermeabilizantes.svg"
+            image="/assets/figma/impermeabilizantes.png"
+            href="/produtos?category=impermeabilizantes&subcategory=Mantas%20L%C3%ADquidas"
+            variants={itemVariants}
+          />
+        </div>
+      </motion.div>
+
+      {/* Partners / Certificates Section */}
+      <motion.div 
+        className="w-full max-w-[1440px] px-6 xl:px-0 flex flex-col gap-12 mt-12"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="flex flex-col gap-12 w-full">
+          {/* Header */}
+          <div className="flex items-center gap-8">
+            <div className="h-px flex-1 bg-[#E2E8F0]"></div>
+             <div className="flex items-center justify-center gap-[10px] px-2 py-1 w-fit rounded-[50px] bg-[rgba(251,185,67,0.2)] border border-[rgba(255,217,150,0.3)] backdrop-blur-[87.7px]">
+                <span className="font-black text-[13px] leading-[1.5em] tracking-[0.12em] text-[#FBB943]">
+                  CERTIFICADOS
+                </span>
+              </div>
+              <div className="h-px flex-1 bg-[#E2E8F0]"></div>
+          </div>
+
+          {/* Logos */}
+          <div className="w-full flex justify-center items-center gap-12 flex-wrap">
+             <div className="relative w-[85px] h-[96px]">
+                <Image
+                  src="/assets/certificates/certificate-1.png"
+                  alt="Certificate 1"
+                  fill
+                  className="object-contain"
+                />
+             </div>
+             <div className="relative w-[99px] h-[100px]">
+                <Image
+                  src="/assets/certificates/certificate-2.png"
+                  alt="Certificate 2"
+                  fill
+                  className="object-contain"
+                />
+             </div>
+             <div className="relative w-[86px] h-[56px]">
+                <Image
+                  src="/assets/certificates/certificate-3.png"
+                  alt="Certificate 3"
+                  fill
+                  className="object-contain"
+                />
+             </div>
+             <div className="relative w-[110px] h-[59px]">
+                <Image
+                  src="/assets/certificates/certificate-4.png"
+                  alt="Certificate 4"
+                  fill
+                  className="object-contain"
+                />
+             </div>
+             <div className="relative w-[110px] h-[55px]">
+                <Image
+                  src="/assets/certificates/certificate-5.png"
+                  alt="Certificate 5"
+                  fill
+                  className="object-contain"
+                />
+             </div>
           </div>
         </div>
       </motion.div>
     </section>
   );
 }
+
+interface ProductCardProps {
+  title: string;
+  icon: string;
+  image: string;
+  href: string;
+  variants: Variants;
+}
+
+function ProductCard({ title, icon, image, href, variants }: ProductCardProps) {
+  return (
+    <motion.div
+      className="w-full"
+      variants={variants}
+    >
+      <Link href={href} className="group relative block w-full h-[400px] rounded-lg overflow-hidden cursor-pointer">
+        {/* Background Image */}
+        <Image
+          src={image}
+          alt={title}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+        
+        {/* Content Overlay */}
+        <div className="absolute inset-0 p-6 flex flex-col justify-end">
+          <div className="bg-white/90 backdrop-blur-md rounded-lg p-4 border border-white/20 shadow-lg flex items-center justify-between transform transition-transform duration-300 translate-y-2 group-hover:translate-y-0">
+            <div className="flex items-center gap-4">
+              <div className="w-8 h-8 flex items-center justify-center bg-[#F8FAFC] rounded">
+                <Image src={icon} alt="" width={20} height={20} />
+              </div>
+              <span className="font-bold text-lg text-[#1C1C1C]">{title}</span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-[#1C1C1C] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                VER MAIS
+              </span>
+              <div className="w-6 h-6 flex items-center justify-center bg-[#FBB943] rounded-full">
+                <Image 
+                  src="/assets/figma/arrow-up-right.svg" 
+                  alt="" 
+                  width={12} 
+                  height={12} 
+                  className="text-white"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
+}
+

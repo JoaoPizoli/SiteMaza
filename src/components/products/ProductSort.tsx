@@ -6,23 +6,19 @@ import { cn } from "@/lib/utils";
 
 interface ProductSortProps {
   onSortChange: (value: string) => void;
-  value?: string;
 }
 
-const options = [
-  "Mais relevantes",
-  "Nome (A-Z)",
-  "Nome (Z-A)",
-  "Linha (A-Z)",
-];
-
-export function ProductSort({ onSortChange, value }: ProductSortProps) {
+export function ProductSort({ onSortChange }: ProductSortProps) {
   const [isOpen, setIsOpen] = React.useState(false);
-  const [selected, setSelected] = React.useState(value ?? options[0]);
+  const [selected, setSelected] = React.useState("Mais relevantes");
 
-  React.useEffect(() => {
-    setSelected(value ?? options[0]);
-  }, [value]);
+  const options = [
+    "Mais relevantes",
+    "Menor preço",
+    "Maior preço",
+    "Nome (A-Z)",
+    "Nome (Z-A)",
+  ];
 
   const handleSelect = (option: string) => {
     setSelected(option);
@@ -31,43 +27,41 @@ export function ProductSort({ onSortChange, value }: ProductSortProps) {
   };
 
   return (
-    <div className="relative z-20 flex items-center gap-3">
-      <span className="text-sm font-medium text-stone">Ordenar por</span>
-
+    <div className="flex items-center gap-4 relative z-20">
+      <span className="text-sm font-medium text-[#64748B]">
+        Ordenar por:
+      </span>
+      
       <div className="relative">
         <button
-          type="button"
-          onClick={() => setIsOpen((current) => !current)}
-          className="flex min-w-[220px] items-center justify-between rounded-full border border-[#171d29]/10 bg-white px-5 py-3 text-sm font-semibold text-ink shadow-[0_12px_28px_rgba(15,23,42,0.08)] transition-colors hover:border-brand/18"
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E2E8F0] rounded-lg hover:border-[#FBB943] transition-colors min-w-[180px] justify-between"
         >
-          <span>{selected}</span>
-          <ChevronDown
+          <span className="text-sm font-medium text-[#1C1C1C]">{selected}</span>
+          <ChevronDown 
             className={cn(
-              "h-4 w-4 text-stone transition-transform duration-200",
-              isOpen && "rotate-180 text-brand",
-            )}
+              "w-4 h-4 text-[#94A3B8] transition-transform duration-200",
+              isOpen && "rotate-180"
+            )} 
           />
         </button>
 
-        {isOpen ? (
-          <div className="absolute right-0 top-full mt-3 w-full overflow-hidden rounded-[24px] border border-[#171d29]/10 bg-white p-2 shadow-[0_22px_50px_rgba(15,23,42,0.14)]">
+        {isOpen && (
+          <div className="absolute top-full right-0 mt-2 w-full bg-white border border-[#E2E8F0] rounded-lg shadow-lg overflow-hidden py-1">
             {options.map((option) => (
               <button
                 key={option}
-                type="button"
                 onClick={() => handleSelect(option)}
                 className={cn(
-                  "w-full rounded-[18px] px-4 py-3 text-left text-sm transition-colors",
-                  selected === option
-                    ? "bg-brand text-white"
-                    : "text-ink hover:bg-sand/80",
+                  "w-full px-4 py-2 text-left text-sm hover:bg-[#F8FAFC] transition-colors",
+                  selected === option ? "text-[#FBB943] font-medium" : "text-[#1C1C1C]"
                 )}
               >
                 {option}
               </button>
             ))}
           </div>
-        ) : null}
+        )}
       </div>
     </div>
   );

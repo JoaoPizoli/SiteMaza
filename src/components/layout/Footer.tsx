@@ -2,170 +2,227 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { ArrowUpRight, CheckCircle2, MapPinned } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { PRODUCT_FILTERS } from "@/lib/products";
+import { motion, Variants } from "framer-motion";
 
-const footerLinks = [
-  { href: "/", label: "Inicio" },
-  { href: "/sobre", label: "Sobre a Maza" },
-  { href: "/produtos", label: "Catalogo completo" },
-  { href: "/onde-encontrar", label: "Onde encontrar" },
-];
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
 
-const supportPoints = [
-  "Portfolio amplo para diferentes segmentos.",
-  "Atendimento consultivo para revendas e obras.",
-  "Distribuicao com foco em escala e confianca.",
-];
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: "easeOut" },
+  },
+};
+
+const logoVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { 
+      type: "spring",
+      stiffness: 200,
+      damping: 20,
+      duration: 0.8
+    },
+  },
+};
+
+const bgLeftVariants: Variants = {
+  hidden: { opacity: 0, x: -50 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 1, ease: "easeOut" },
+  },
+};
+
+const bgRightVariants: Variants = {
+  hidden: { opacity: 0, x: 50 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 1, ease: "easeOut" },
+  },
+};
 
 export function Footer() {
   return (
-    <footer className="relative mt-24 overflow-hidden bg-[#0d1119] text-white">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(201,152,57,0.18),transparent_28%),radial-gradient(circle_at_78%_18%,rgba(170,27,31,0.26),transparent_32%),linear-gradient(180deg,#101521_0%,#0b0f16_100%)]" />
-      <div className="outline-grid absolute inset-0 opacity-25" />
+    <footer className="w-full relative bg-[#B11116] overflow-hidden">
+      {/* Vector Backgrounds */}
+      <motion.div 
+        className="absolute left-[-31px] top-[209px] pointer-events-none select-none z-0"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={bgLeftVariants}
+      >
+        <Image
+          src="/assets/footer/footer-bg-1.svg"
+          alt="Background Vector 1"
+          width={650}
+          height={141}
+        />
+      </motion.div>
+      <motion.div 
+        className="absolute right-[-43px] top-[228px] pointer-events-none select-none z-0"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={bgRightVariants}
+      >
+        <Image
+          src="/assets/footer/footer-bg-2.svg"
+          alt="Background Vector 2"
+          width={356}
+          height={141}
+        />
+      </motion.div>
 
-      <div className="site-container relative z-10 py-16 md:py-20">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="mb-10 grid gap-6 rounded-[36px] border border-white/10 bg-white/6 p-6 backdrop-blur-xl md:grid-cols-[1.4fr_0.9fr] md:p-8"
+      {/* Main Content */}
+      <div className="w-full flex justify-center py-16 px-6 relative z-10">
+        <motion.div 
+          className="w-full max-w-[1440px] flex flex-col lg:flex-row justify-between gap-12 lg:gap-8"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          variants={containerVariants}
         >
-          <div>
-            <span className="section-tag">Vamos conversar</span>
-            <h2 className="mt-5 max-w-[14ch] font-display text-3xl leading-[1.05] text-white md:text-[3.1rem]">
-              Pronto para elevar o acabamento dos seus projetos?
-            </h2>
-            <p className="mt-4 max-w-[60ch] text-sm leading-7 text-white/72 md:text-base">
-              A Maza combina tecnologia, portfolio amplo e presenca nacional
-              para atender obras, revendas e aplicacoes tecnicas com mais
-              seguranca comercial.
-            </p>
-          </div>
+          
+          {/* Logo Column */}
+          <motion.div className="flex-shrink-0" variants={logoVariants}>
+            <Link href="/">
+              <Image
+                src="/assets/footer/logo-maza.png"
+                alt="Maza Logo"
+                width={168}
+                height={95}
+                className="object-contain"
+              />
+            </Link>
+          </motion.div>
 
-          <div className="flex flex-col justify-between gap-4 rounded-[28px] border border-white/10 bg-[#111826]/92 p-5">
-            <div className="space-y-3">
-              {supportPoints.map((item) => (
-                <div key={item} className="flex items-start gap-3">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-gold" />
-                  <span className="text-sm leading-6 text-white/74">{item}</span>
+          {/* Links Columns Container */}
+          <div className="flex flex-col md:flex-row gap-12 lg:gap-24">
+            
+            {/* Links Úteis */}
+            <motion.div className="flex flex-col gap-4" variants={itemVariants}>
+              <h5 className="font-roboto font-semibold text-[25px] leading-[1.4em] text-white">
+                Links úteis
+              </h5>
+              <div className="flex flex-col gap-2">
+                <Link href="/" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                  Início
+                </Link>
+                <Link href="/produtos" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                  Linha de produtos
+                </Link>
+                <Link href="/representantes" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                  Representantes
+                </Link>
+                <Link href="/onde-encontrar" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                  Onde encontrar
+                </Link>
+                <Link href="/area-cliente" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                  Área do cliente
+                </Link>
+                <Link href="/trabalhe-conosco" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                  Trabalhe conosco
+                </Link>
+                <Link href="/downloads" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                  Downloads
+                </Link>
+                <Link href="/mural" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                  Mural
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* Linhas de Produtos */}
+            <motion.div className="flex flex-col gap-4" variants={itemVariants}>
+              <h5 className="font-roboto font-semibold text-[25px] leading-[1.4em] text-white">
+                Linhas de produtos
+              </h5>
+              <div className="flex flex-col gap-2">
+                <Link href="/produtos/imobiliaria" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                  Linha imobiliária
+                </Link>
+                <Link href="/produtos/automotiva" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                  Linha automotiva
+                </Link>
+                <Link href="/produtos/industrial" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                  Linha industrial
+                </Link>
+                <Link href="/produtos/impermeabilizantes" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                  Linha Impermeabilizantes
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* Social Links */}
+            <motion.div className="flex flex-col gap-4" variants={itemVariants}>
+              <div className="flex items-center gap-2 group cursor-pointer">
+                <div className="w-5 h-5 flex items-center justify-center">
+                  <Image src="/assets/footer/instagram.svg" alt="Instagram" width={20} height={20} />
                 </div>
-              ))}
-            </div>
+                <span className="font-roboto font-normal text-[16px] leading-[1.5em] text-white group-hover:opacity-80 transition-opacity">
+                  Instagram
+                </span>
+              </div>
+              <div className="flex items-center gap-2 group cursor-pointer">
+                <div className="w-5 h-5 flex items-center justify-center">
+                  <Image src="/assets/footer/facebook.svg" alt="Facebook" width={20} height={20} />
+                </div>
+                <span className="font-roboto font-normal text-[16px] leading-[1.5em] text-white group-hover:opacity-80 transition-opacity">
+                  Facebook
+                </span>
+              </div>
+              <div className="flex items-center gap-2 group cursor-pointer">
+                <div className="w-5 h-5 flex items-center justify-center">
+                  <Image src="/assets/footer/linkedin.svg" alt="Linkedin" width={20} height={20} />
+                </div>
+                <span className="font-roboto font-normal text-[16px] leading-[1.5em] text-white group-hover:opacity-80 transition-opacity">
+                  Linkedin
+                </span>
+              </div>
+            </motion.div>
 
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Button asChild variant="secondary" className="sm:flex-1">
-                <Link href="/onde-encontrar">
-                  <MapPinned className="h-4 w-4" />
-                  Encontrar ponto de venda
-                </Link>
-              </Button>
-
-              <Button
-                asChild
-                variant="outline"
-                className="border-white/10 bg-white/6 text-white hover:bg-white/12 sm:flex-1"
-              >
-                <Link href="/produtos">
-                  Ver produtos
-                  <ArrowUpRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
           </div>
         </motion.div>
+      </div>
 
-        <div className="grid gap-8 rounded-[36px] border border-white/10 bg-white/4 p-6 backdrop-blur-xl lg:grid-cols-[1.1fr_0.7fr_0.8fr_1fr] lg:p-8">
-          <div className="space-y-5">
-            <div className="rounded-full border border-white/10 bg-white/6 px-4 py-3 w-fit">
-              <Image
-                src="/assets/navbar/logo-maza.png"
-                alt="Tintas Maza"
-                width={122}
-                height={68}
-                className="h-auto w-[110px]"
-              />
-            </div>
-
-            <div className="space-y-3">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-white/40">
-                Fabrica em Mococa - SP
-              </p>
-              <p className="max-w-[34ch] text-sm leading-7 text-white/72">
-                Solucoes em tintas e revestimentos com foco em desempenho,
-                consistencia visual e confianca para cada etapa da aplicacao.
-              </p>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-[0.22em] text-white/42">
-              Navegacao
-            </h3>
-            <div className="mt-5 flex flex-col gap-3">
-              {footerLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-sm text-white/72 transition-colors hover:text-white"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-[0.22em] text-white/42">
-              Linhas
-            </h3>
-            <div className="mt-5 flex flex-col gap-3">
-              {PRODUCT_FILTERS.map((line) => (
-                <Link
-                  key={line.id}
-                  href={`/produtos?category=${line.id}`}
-                  className="text-sm text-white/72 transition-colors hover:text-white"
-                >
-                  {line.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-[28px] border border-white/10 bg-[#111826]/88 p-5">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-white/42">
-              Diferenciais
-            </p>
-            <div className="mt-5 space-y-4">
-              <div>
-                <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-gold">
-                  Acabamento
-                </span>
-                <p className="mt-2 text-sm leading-6 text-white/74">
-                  Formulacoes pensadas para consistencia, cobertura e leitura de
-                  marca no ponto de venda e na obra.
-                </p>
-              </div>
-
-              <div>
-                <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-gold">
-                  Performance
-                </span>
-                <p className="mt-2 text-sm leading-6 text-white/74">
-                  Portfolio preparado para aplicacoes imobiliarias, automotivas,
-                  industriais e de impermeabilizacao.
-                </p>
-              </div>
-            </div>
-          </div>
+      {/* Bottom Bar */}
+      <div className="w-full bg-[#A00010] relative">
+         {/* Decorative Top Border/Vector */}
+        <div className="absolute top-0 left-0 w-full h-[4px]">
+             <Image 
+                src="/assets/footer/footer-bottom-bg.svg" 
+                alt="Footer Divider" 
+                width={1920} 
+                height={4} 
+                className="w-full h-full object-cover"
+             />
         </div>
 
-        <div className="mt-6 flex flex-col gap-3 border-t border-white/10 pt-6 text-sm text-white/50 md:flex-row md:items-center md:justify-between">
-          <span>Politica de privacidade</span>
-          <span>Tintas Maza. Todos os direitos reservados.</span>
+        <div className="flex justify-center py-6 px-6">
+          <div className="w-full max-w-[1440px] flex flex-col md:flex-row justify-between items-center gap-2 text-center md:text-left">
+            <span className="font-roboto font-normal text-[13px] leading-[1.5em] text-white">
+              Política de privacidade
+            </span>
+            <span className="font-roboto font-normal text-[13px] leading-[1.5em] text-white">
+              Todos os direitos reservados.
+            </span>
+          </div>
         </div>
       </div>
     </footer>

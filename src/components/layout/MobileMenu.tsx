@@ -1,110 +1,149 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
+import { X } from "lucide-react";
 import { motion } from "framer-motion";
-import { ArrowUpRight, MapPinned, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 interface MobileMenuProps {
   onClose: () => void;
-  pathname: string;
-  links: Array<{ href: string; label: string }>;
 }
 
-export function MobileMenu({ onClose, pathname, links }: MobileMenuProps) {
-  const isActiveLink = (href: string) => {
-    if (href === "/") {
-      return pathname === "/";
-    }
-
-    return pathname === href || pathname.startsWith(`${href}/`);
-  };
-
+export function MobileMenu({ onClose }: MobileMenuProps) {
   return (
-    <div className="fixed inset-0 z-[60] flex justify-end">
-      <motion.button
+    <div className="fixed inset-0 z-50 flex justify-end">
+      {/* Backdrop */}
+      <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.25 }}
-        className="absolute inset-0 bg-[#0e131d]/68 backdrop-blur-sm"
+        transition={{ duration: 0.3 }}
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onClose}
-        aria-label="Fechar menu"
       />
 
-      <motion.aside
+      {/* Menu Content */}
+      <motion.div 
         initial={{ x: "100%" }}
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
-        transition={{ type: "spring", stiffness: 220, damping: 26 }}
-        className="surface-panel-dark relative flex h-full w-full max-w-[380px] flex-col gap-8 rounded-none rounded-l-[32px] border-l border-white/10 p-5"
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="relative w-[338px] h-full bg-[rgba(0,0,0,0.1)] backdrop-blur-[68.7px] flex flex-col p-3 gap-6 overflow-y-auto border-l border-white/10 shadow-2xl"
       >
-        <div className="flex items-center justify-between">
-          <div className="rounded-full border border-white/10 bg-white/6 px-3 py-2">
-            <Image
-              src="/assets/navbar/logo-maza.png"
-              alt="Tintas Maza"
-              width={104}
-              height={58}
-              className="h-auto w-[92px]"
-            />
+        
+        {/* Close Button */}
+        <button 
+          onClick={onClose}
+          className="absolute top-3 right-3 p-2 text-white hover:bg-white/10 rounded-full transition-colors"
+        >
+          <X size={24} />
+        </button>
+
+        <div className="flex flex-col gap-6 mt-12 px-3">
+          {/* Nav Items 1 */}
+          <div className="flex flex-col gap-2">
+            <Link 
+              href="/" 
+              onClick={onClose}
+              className="font-roboto font-normal text-base leading-[1.5em] text-white hover:opacity-80 transition-opacity py-2"
+            >
+              Início
+            </Link>
+            
+            <Link 
+              href="/sobre" 
+              onClick={onClose}
+              className="font-roboto font-normal text-base leading-[1.5em] text-white hover:opacity-80 transition-opacity py-2"
+            >
+              Sobre a Maza
+            </Link>
+            
+            <Link 
+              href="/produtos" 
+              onClick={onClose}
+              className="flex items-center gap-1 py-2 group"
+            >
+              <span className="font-roboto font-normal text-base leading-[1.5em] text-white group-hover:opacity-80 transition-opacity">
+                Linha de produtos
+              </span>
+              <div className="w-4 h-4 flex items-center justify-center">
+                <Image
+                  src="/assets/navbar/corner-right-down.svg"
+                  alt="Arrow"
+                  width={16}
+                  height={16}
+                />
+              </div>
+            </Link>
+            
+            <Link 
+              href="/onde-encontrar" 
+              onClick={onClose}
+              className="font-roboto font-normal text-base leading-[1.5em] text-white hover:opacity-80 transition-opacity py-2"
+            >
+              Onde encontrar
+            </Link>
+            
+            <Link 
+              href="/representantes" 
+              onClick={onClose}
+              className="font-roboto font-normal text-base leading-[1.5em] text-white hover:opacity-80 transition-opacity py-2"
+            >
+              Representantes
+            </Link>
           </div>
 
-          <button
-            onClick={onClose}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/6 text-white transition-colors hover:bg-white/10"
-            aria-label="Fechar menu"
-          >
-            <X size={20} />
-          </button>
-        </div>
-
-        <div className="rounded-[28px] border border-white/10 bg-white/6 p-4">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.26em] text-white/45">
-            Presenca nacional
-          </span>
-          <p className="mt-3 text-sm leading-6 text-white/74">
-            Linhas imobiliarias, automotivas, industriais e impermeabilizantes
-            com foco em desempenho tecnico e acabamento profissional.
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
+          {/* Nav Items 2 (Buttons) */}
+          <div className="flex flex-col gap-4">
+            <Link 
+              href="/onde-encontrar" 
               onClick={onClose}
-              className={cn(
-                "rounded-[22px] px-4 py-3 text-base font-semibold transition-all duration-300",
-                isActiveLink(link.href)
-                  ? "bg-white text-ink shadow-[0_14px_32px_rgba(255,255,255,0.16)]"
-                  : "text-white/74 hover:bg-white/8 hover:text-white",
-              )}
+              className="flex items-center gap-1 p-1 pr-3 bg-[rgba(177,17,22,0.2)] border border-[rgba(255,181,189,0.3)] backdrop-blur-[87.7px] rounded text-[#FFC9CB] hover:bg-[rgba(177,17,22,0.3)] transition-colors w-fit"
             >
-              {link.label}
+              <div className="w-[17px] h-[18px] flex items-center justify-center p-1">
+                <Image
+                  src="/assets/navbar/map-pin.svg"
+                  alt="Map Pin"
+                  width={17}
+                  height={18}
+                />
+              </div>
+              <span className="font-roboto font-normal text-base leading-[1.5em]">Onde encontrar</span>
             </Link>
-          ))}
-        </div>
 
-        <div className="mt-auto flex flex-col gap-3">
-          <Button asChild variant="secondary" size="lg">
-            <Link href="/onde-encontrar" onClick={onClose}>
-              <MapPinned className="h-4 w-4" />
-              Encontrar loja
+            <Link 
+              href="/area-cliente" 
+              onClick={onClose}
+              className="flex items-center gap-1 p-1 pr-3 bg-[rgba(251,185,67,0.2)] border border-[rgba(255,217,150,0.3)] backdrop-blur-[87.7px] rounded text-[#FBB943] hover:bg-[rgba(251,185,67,0.3)] transition-colors w-fit"
+            >
+              <div className="w-[18px] h-[18px] flex items-center justify-center p-1">
+                 <Image
+                  src="/assets/navbar/user.svg"
+                  alt="User"
+                  width={18}
+                  height={18}
+                />
+              </div>
+              <span className="font-roboto font-normal text-base leading-[1.5em]">Área do cliente</span>
             </Link>
-          </Button>
 
-          <Button asChild variant="outline" size="lg" className="border-white/10 bg-white/8 text-white hover:bg-white/12">
-            <Link href="/produtos" onClick={onClose}>
-              Ver catalogo
-              <ArrowUpRight className="h-4 w-4" />
-            </Link>
-          </Button>
+            {/* Search Button */}
+            <button 
+              className="flex items-center justify-start gap-2.5 p-1 bg-[rgba(173,173,173,0.2)] border border-[rgba(21,21,21,0.3)] rounded hover:bg-[rgba(173,173,173,0.3)] transition-colors w-fit"
+              aria-label="Search"
+            >
+               <div className="w-6 h-6 flex items-center justify-center">
+                 <Image
+                  src="/assets/navbar/search-icon.svg"
+                  alt="Search"
+                  width={24}
+                  height={24}
+                />
+               </div>
+            </button>
+          </div>
         </div>
-      </motion.aside>
+      </motion.div>
     </div>
   );
 }
