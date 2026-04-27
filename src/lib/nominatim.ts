@@ -1,4 +1,23 @@
-import { getDemoCepCoordinates, normalizeCep, type GeoPoint } from "@/lib/store-locator";
+import { normalizeCep, type GeoPoint } from "@/lib/store-locator";
+
+/* ── Types ─────────────────────────────────────────────────────────── */
+
+interface ViaCepResponse {
+  cep: string;
+  logradouro: string;
+  complemento: string;
+  unidade: string;
+  bairro: string;
+  localidade: string;
+  uf: string;
+  estado: string;
+  regiao: string;
+  ibge: string;
+  gia: string;
+  ddd: string;
+  siafi: string;
+  erro?: boolean;
+}
 
 interface NominatimPlace {
   lat: string;
@@ -9,32 +28,37 @@ interface NominatimPlace {
 export interface GeocodedCep {
   coordinates: GeoPoint;
   label: string;
-  source: "nominatim" | "demo";
+  source: "viacep+nominatim" | "nominatim";
 }
 
-const NOMINATIM_ENDPOINT = "https://nominatim.openstreetmap.org/search";
-const REQUEST_TIMEOUT_MS = 8000;
+/* ── Constants ─────────────────────────────────────────────────────── */
 
-function parsePlace(place: NominatimPlace | undefined): GeocodedCep | null {
-  if (!place) {
-    return null;
-  }
+const VIACEP_ENDPOINT = "https://viacep.com.br/ws";
+const NOMINATIM_ENDPOINT = "https://nominatim.openstreetmap.org/search";
+const REQUEST_TIMEOUT_MS = 10_000;
+
+/* ── Helpers ───────────────────────────────────────────────────────── */
+
+function parsePlace(place: NominatimPlace | undefined, label: string, source: GeocodedCep["source"]): GeocodedCep | null {
+  if (!place) return null;
 
   const lat = Number(place.lat);
   const lng = Number(place.lon);
 
-  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-    return null;
-  }
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
 
   return {
     coordinates: { lat, lng },
-    label: place.display_name ?? "Localização encontrada",
-    source: "nominatim",
+    label,
+    source,
   };
 }
 
-async function requestNominatim(params: URLSearchParams, signal?: AbortSignal) {
+/**
+ * Creates a fetch call with an automatic timeout and external abort
+ * signal support.
+ */
+async function fetchWithTimeout(url: string, signal?: AbortSignal): Promise<Response> {
   const controller = new AbortController();
   const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   const abort = () => controller.abort();
@@ -42,73 +66,159 @@ async function requestNominatim(params: URLSearchParams, signal?: AbortSignal) {
   signal?.addEventListener("abort", abort, { once: true });
 
   try {
-    const response = await fetch(`${NOMINATIM_ENDPOINT}?${params.toString()}`, {
+    const response = await fetch(url, {
       signal: controller.signal,
       headers: { Accept: "application/json" },
-      cache: "force-cache",
     });
 
     if (!response.ok) {
-      throw new Error("Não foi possível consultar o CEP agora.");
+      throw new Error(`HTTP ${response.status}`);
     }
 
-    return (await response.json()) as NominatimPlace[];
+    return response;
   } finally {
     window.clearTimeout(timeoutId);
     signal?.removeEventListener("abort", abort);
   }
 }
 
+/* ── Step 1 — ViaCEP ───────────────────────────────────────────────── */
+
+/**
+ * Queries the ViaCEP API to resolve a CEP into a structured address.
+ * Returns `null` when the CEP is not found.
+ */
+async function fetchViaCep(cep: string, signal?: AbortSignal): Promise<ViaCepResponse | null> {
+  try {
+    const response = await fetchWithTimeout(`${VIACEP_ENDPOINT}/${cep}/json/`, signal);
+    const data = (await response.json()) as ViaCepResponse;
+
+    if (data.erro) return null;
+
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Builds a human-readable label from a ViaCEP response.
+ */
+function buildViaCepLabel(viacep: ViaCepResponse): string {
+  const parts: string[] = [];
+
+  if (viacep.logradouro) parts.push(viacep.logradouro);
+  if (viacep.bairro) parts.push(viacep.bairro);
+  if (viacep.localidade) parts.push(viacep.localidade);
+  if (viacep.uf) parts.push(viacep.uf);
+
+  return parts.join(", ") || "Localização encontrada";
+}
+
+/* ── Step 2 — Nominatim geocoding ──────────────────────────────────── */
+
+/**
+ * Uses a structured ViaCEP address to query Nominatim for lat/lng.
+ * It tries a specific query first (street + city + state), then falls
+ * back to city + state only.
+ */
+async function geocodeWithNominatim(viacep: ViaCepResponse, signal?: AbortSignal): Promise<GeocodedCep | null> {
+  const label = buildViaCepLabel(viacep);
+
+  // Attempt 1: specific street + city + state
+  if (viacep.logradouro) {
+    const specificQuery = [viacep.logradouro, viacep.localidade, viacep.uf, "Brasil"].join(", ");
+    const specificParams = new URLSearchParams({
+      format: "jsonv2",
+      countrycodes: "br",
+      q: specificQuery,
+      limit: "1",
+      "accept-language": "pt-BR",
+    });
+
+    try {
+      const response = await fetchWithTimeout(`${NOMINATIM_ENDPOINT}?${specificParams.toString()}`, signal);
+      const places = (await response.json()) as NominatimPlace[];
+      const result = parsePlace(places[0], label, "viacep+nominatim");
+      if (result) return result;
+    } catch {
+      // fall through to next attempt
+    }
+  }
+
+  // Attempt 2: city + state (broader, but still accurate to the municipality)
+  const broadQuery = [viacep.localidade, viacep.uf, "Brasil"].join(", ");
+  const broadParams = new URLSearchParams({
+    format: "jsonv2",
+    countrycodes: "br",
+    q: broadQuery,
+    limit: "1",
+    "accept-language": "pt-BR",
+  });
+
+  try {
+    const response = await fetchWithTimeout(`${NOMINATIM_ENDPOINT}?${broadParams.toString()}`, signal);
+    const places = (await response.json()) as NominatimPlace[];
+    const result = parsePlace(places[0], label, "viacep+nominatim");
+    if (result) return result;
+  } catch {
+    // fall through
+  }
+
+  return null;
+}
+
+/**
+ * Fallback: query Nominatim directly with the raw CEP digits.
+ */
+async function geocodeCepDirectly(cep: string, signal?: AbortSignal): Promise<GeocodedCep | null> {
+  const params = new URLSearchParams({
+    format: "jsonv2",
+    countrycodes: "br",
+    postalcode: cep,
+    limit: "1",
+    "accept-language": "pt-BR",
+  });
+
+  try {
+    const response = await fetchWithTimeout(`${NOMINATIM_ENDPOINT}?${params.toString()}`, signal);
+    const places = (await response.json()) as NominatimPlace[];
+    return parsePlace(places[0], places[0]?.display_name ?? "Localização encontrada", "nominatim");
+  } catch {
+    return null;
+  }
+}
+
+/* ── Main entry-point ──────────────────────────────────────────────── */
+
+/**
+ * Resolves a Brazilian CEP to geographic coordinates using:
+ *
+ * 1. **ViaCEP** → structured address (street, city, state)
+ * 2. **Nominatim** → geocodes the structured address into lat/lng
+ * 3. **Fallback** → tries Nominatim directly with the raw CEP
+ *
+ * Throws when the CEP cannot be resolved by any method.
+ */
 export async function geocodeCepWithNominatim(
   cep: string,
   signal?: AbortSignal,
 ): Promise<GeocodedCep> {
   const normalizedCep = normalizeCep(cep);
-  const demoCoordinates = getDemoCepCoordinates(normalizedCep);
 
-  try {
-    const postalCodeParams = new URLSearchParams({
-      format: "jsonv2",
-      countrycodes: "br",
-      postalcode: normalizedCep,
-      addressdetails: "1",
-      limit: "1",
-      "accept-language": "pt-BR",
-    });
+  // ── Primary path: ViaCEP → Nominatim ──────────────────────────────
+  const viacep = await fetchViaCep(normalizedCep, signal);
 
-    const postalCodeMatch = parsePlace((await requestNominatim(postalCodeParams, signal))[0]);
+  if (viacep) {
+    const geocoded = await geocodeWithNominatim(viacep, signal);
 
-    if (postalCodeMatch) {
-      return postalCodeMatch;
-    }
-
-    const queryParams = new URLSearchParams({
-      format: "jsonv2",
-      countrycodes: "br",
-      q: `${normalizedCep}, Brasil`,
-      addressdetails: "1",
-      limit: "1",
-      "accept-language": "pt-BR",
-    });
-
-    const queryMatch = parsePlace((await requestNominatim(queryParams, signal))[0]);
-
-    if (queryMatch) {
-      return queryMatch;
-    }
-  } catch (error) {
-    if (signal?.aborted) {
-      throw error;
-    }
+    if (geocoded) return geocoded;
   }
 
-  if (demoCoordinates) {
-    return {
-      coordinates: demoCoordinates,
-      label: "CEP de demonstração",
-      source: "demo",
-    };
-  }
+  // ── Fallback: raw CEP → Nominatim ────────────────────────────────
+  const directResult = await geocodeCepDirectly(normalizedCep, signal);
+
+  if (directResult) return directResult;
 
   throw new Error("Não encontramos esse CEP. Confira os números e tente novamente.");
 }

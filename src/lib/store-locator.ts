@@ -266,11 +266,11 @@ export const MOCK_REPRESENTATIVES: RepresentativeLocation[] = [
 
 export const BRAZIL_CENTER: GeoPoint = { lat: -15.7801, lng: -47.9292 };
 
-export const DEMO_CEPS: Array<{ label: string; cep: string; coordinates: GeoPoint }> = [
-  { label: "Mococa", cep: "13730-000", coordinates: { lat: -21.4678, lng: -47.0044 } },
-  { label: "São Paulo", cep: "01310-100", coordinates: { lat: -23.5614, lng: -46.6559 } },
-  { label: "Belo Horizonte", cep: "30130-010", coordinates: { lat: -19.9187, lng: -43.9387 } },
-  { label: "Curitiba", cep: "80010-000", coordinates: { lat: -25.4296, lng: -49.2719 } },
+export const DEMO_CEPS: Array<{ label: string; cep: string }> = [
+  { label: "Mococa", cep: "13730-000" },
+  { label: "São Paulo", cep: "01310-100" },
+  { label: "Belo Horizonte", cep: "30130-010" },
+  { label: "Curitiba", cep: "80010-000" },
 ];
 
 export function normalizeCep(value: string) {
@@ -320,11 +320,6 @@ export function formatDistance(distanceKm?: number) {
   return `${distanceKm.toLocaleString("pt-BR", {
     maximumFractionDigits: distanceKm < 100 ? 1 : 0,
   })} km`;
-}
-
-export function getDemoCepCoordinates(cep: string) {
-  const normalizedCep = normalizeCep(cep);
-  return DEMO_CEPS.find((item) => normalizeCep(item.cep) === normalizedCep)?.coordinates;
 }
 
 export function getRepresentativeStates() {

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Menu, MapPin, User, Search, ChevronDown } from "lucide-react";
+import { Menu, MapPin, User, ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { MobileMenu } from "./MobileMenu";
@@ -213,18 +213,6 @@ export function Navbar() {
               <span>Área do cliente</span>
             </Link>
 
-            <button
-              type="button"
-              aria-label="Buscar"
-              className={cn(
-                "inline-flex items-center justify-center w-10 h-10 rounded-full transition-colors",
-                solid
-                  ? "text-[#1C1C1C] hover:bg-[#1C1C1C]/5"
-                  : "text-white hover:bg-white/10"
-              )}
-            >
-              <Search className="w-5 h-5" aria-hidden />
-            </button>
           </div>
 
           {/* Botão mobile */}

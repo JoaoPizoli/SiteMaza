@@ -15,6 +15,8 @@ export interface StoreLocatorMapProps {
   stores: StoreWithDistance[];
   selectedStoreId?: string;
   userLocation?: GeoPoint;
+  userLocationLabel?: string;
+  userLocationSource?: "cep" | "ip";
   onSelectStore: (storeId: string) => void;
 }
 
@@ -79,12 +81,19 @@ export function StoreLocatorMap({
   stores,
   selectedStoreId,
   userLocation,
+  userLocationLabel,
+  userLocationSource,
   onSelectStore,
 }: StoreLocatorMapProps) {
   const userIcon = useMemo(() => createUserIcon(), []);
   const selectedStore = stores.find((store) => store.id === selectedStoreId) ?? stores[0];
   const center = userLocation ?? selectedStore?.coordinates ?? BRAZIL_CENTER;
   const routeLine = userLocation && selectedStore ? [toLatLng(userLocation), toLatLng(selectedStore.coordinates)] : null;
+  const userLocationTitle = userLocationSource === "ip" ? "Sua localização aproximada" : "Seu CEP";
+  const userLocationDescription =
+    userLocationSource === "ip"
+      ? "Ponto estimado pelo IP para calcular as lojas mais próximas."
+      : "Ponto usado para calcular as lojas mais próximas.";
 
   return (
     <MapContainer
@@ -112,8 +121,9 @@ export function StoreLocatorMap({
           <Marker icon={userIcon} position={toLatLng(userLocation)}>
             <Popup>
               <div className="flex min-w-36 flex-col gap-1">
-                <strong className="text-sm text-[#1C1C1C]">Seu CEP</strong>
-                <span className="text-xs text-[#5F5F5A]">Ponto usado para calcular as lojas mais próximas.</span>
+                <strong className="text-sm text-[#1C1C1C]">{userLocationTitle}</strong>
+                {userLocationLabel ? <span className="text-xs font-semibold text-[#1C1C1C]">{userLocationLabel}</span> : null}
+                <span className="text-xs text-[#5F5F5A]">{userLocationDescription}</span>
               </div>
             </Popup>
           </Marker>
@@ -152,7 +162,8 @@ export function StoreLocatorMap({
 
                 <div className="flex flex-wrap gap-2">
                   <a
-                    className="inline-flex items-center gap-1.5 rounded-full bg-[#B11116] px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-[#A00010]"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-[#B11116] px-3 py-2 text-xs font-bold transition-colors hover:bg-[#A00010]"
+                    style={{ color: "#fff" }}
                     href={`https://www.google.com/maps/dir/?api=1&destination=${store.coordinates.lat},${store.coordinates.lng}`}
                     rel="noreferrer"
                     target="_blank"
@@ -169,7 +180,7 @@ export function StoreLocatorMap({
                   </a>
                   <a
                     className="inline-flex items-center gap-1.5 rounded-full border border-[#EBEBEB] px-3 py-2 text-xs font-bold text-[#1C1C1C] transition-colors hover:border-[#B11116]/40 hover:text-[#B11116]"
-                    href={`https://www.openstreetmap.org/?mlat=${store.coordinates.lat}&mlon=${store.coordinates.lng}#map=15/${store.coordinates.lat}/${store.coordinates.lng}`}
+                    href={`https://www.google.com/maps/search/?api=1&query=${store.coordinates.lat},${store.coordinates.lng}`}
                     rel="noreferrer"
                     target="_blank"
                   >

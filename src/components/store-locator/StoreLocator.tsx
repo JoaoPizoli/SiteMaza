@@ -14,13 +14,14 @@ import {
   Navigation,
   Phone,
   Search,
-  ShieldCheck,
+
   Store,
   Users,
 } from "lucide-react";
+import { geolocateByIp } from "@/lib/ip-location";
 import { geocodeCepWithNominatim, type GeocodedCep } from "@/lib/nominatim";
 import {
-  DEMO_CEPS,
+
   MOCK_REPRESENTATIVES,
   MOCK_STORES,
   formatCep,
@@ -71,6 +72,10 @@ const CHANNEL_LABEL: Record<StoreChannel, string> = {
 
 type LocatorMode = "stores" | "representatives";
 type SearchStatus = "idle" | "loading" | "success" | "error";
+type LocationContext = {
+  source: "cep" | "ip";
+  label: string;
+};
 
 function MapLoadingState() {
   return (
@@ -83,17 +88,7 @@ function MapLoadingState() {
   );
 }
 
-function getStoreStatusCopy(status: SearchStatus, searchedCep: string, visibleStores: StoreWithDistance[]) {
-  if (status === "loading") {
-    return "Buscando coordenadas do CEP...";
-  }
 
-  if (status === "success") {
-    return `${visibleStores.length} lojas mais próximas de ${searchedCep}.`;
-  }
-
-  return `${MOCK_STORES.length} lojas mockadas disponíveis para teste.`;
-}
 
 function SelectShell({
   children,
@@ -173,7 +168,7 @@ function StoreCard({
 
       <div className="mt-4 flex flex-wrap gap-2">
         <a
-          className="inline-flex items-center gap-2 rounded-full bg-[#1C1C1C] px-4 py-2 text-xs font-black uppercase tracking-[0.08em] text-white transition-colors hover:bg-[#B11116]"
+          className="inline-flex items-center gap-2 rounded-full bg-[#B11116] px-4 py-2 text-xs font-black uppercase tracking-[0.08em] text-white shadow-[0_14px_26px_-16px_rgba(177,17,22,0.7)] transition-colors hover:bg-[#A00010]"
           href={`https://www.google.com/maps/dir/?api=1&destination=${store.coordinates.lat},${store.coordinates.lng}`}
           rel="noreferrer"
           target="_blank"
@@ -255,17 +250,58 @@ export function StoreLocator() {
   const [activeMode, setActiveMode] = useState<LocatorMode>("stores");
   const [cep, setCep] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [geocodedLabel, setGeocodedLabel] = useState("");
+
   const [representativeCity, setRepresentativeCity] = useState("");
   const [representativeState, setRepresentativeState] = useState("");
-  const [searchedCep, setSearchedCep] = useState("");
+
   const [selectedStoreId, setSelectedStoreId] = useState(MOCK_STORES[0]?.id);
   const [status, setStatus] = useState<SearchStatus>("idle");
   const [userLocation, setUserLocation] = useState<GeoPoint | undefined>();
+  const [locationContext, setLocationContext] = useState<LocationContext>();
+  const [isDetectingIpLocation, setIsDetectingIpLocation] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  const ipLocationAbortRef = useRef<AbortController | null>(null);
+  const hasManualLocationSearchRef = useRef(false);
   const cacheRef = useRef(new Map<string, GeocodedCep>());
 
   useEffect(() => () => abortRef.current?.abort(), []);
+
+  useEffect(() => {
+    let isActive = true;
+    const controller = new AbortController();
+
+    ipLocationAbortRef.current = controller;
+    setIsDetectingIpLocation(true);
+
+    void geolocateByIp(controller.signal)
+      .then((result) => {
+        if (!isActive || controller.signal.aborted || hasManualLocationSearchRef.current) {
+          return;
+        }
+
+        const storesByDistance = getStoresByDistance(result.coordinates);
+
+        setUserLocation(result.coordinates);
+        setLocationContext({ source: "ip", label: result.label });
+        setSelectedStoreId(storesByDistance[0]?.id);
+      })
+      .catch(() => {
+        // IP-based geolocation is only a convenience; CEP search remains available.
+      })
+      .finally(() => {
+        if (!isActive || ipLocationAbortRef.current !== controller) {
+          return;
+        }
+
+        ipLocationAbortRef.current = null;
+        setIsDetectingIpLocation(false);
+      });
+
+    return () => {
+      isActive = false;
+      controller.abort();
+    };
+  }, []);
 
   const rankedStores = useMemo<StoreWithDistance[]>(() => {
     if (!userLocation) {
@@ -290,12 +326,33 @@ export function StoreLocator() {
     [representativeCity, representativeState],
   );
   const selectedStore = visibleStores.find((store) => store.id === selectedStoreId) ?? visibleStores[0];
-  const nearestStore = visibleStores[0];
-  const storeStateCount = useMemo(() => new Set(MOCK_STORES.map((store) => store.state)).size, []);
-  const storeStatusCopy = getStoreStatusCopy(status, searchedCep, visibleStores);
+  const storeSearchHint = useMemo(() => {
+    if (status === "loading") {
+      return "Buscando o CEP informado para refinar as lojas mais próximas.";
+    }
+
+    if (isDetectingIpLocation) {
+      return "Detectando sua localização aproximada pelo IP. Digite o CEP se quiser uma busca mais certeira.";
+    }
+
+    if (locationContext?.source === "ip") {
+      return `Lojas ordenadas pela localização aproximada de ${locationContext.label}. Digite o CEP para refinar.`;
+    }
+
+    if (locationContext?.source === "cep") {
+      return "Lojas ordenadas pelo CEP informado.";
+    }
+
+    return "Busque por CEP para ordenar lojas por distância.";
+  }, [isDetectingIpLocation, locationContext, status]);
 
   async function runSearch(rawCep: string) {
     const normalizedCep = normalizeCep(rawCep);
+
+    hasManualLocationSearchRef.current = true;
+    ipLocationAbortRef.current?.abort();
+    ipLocationAbortRef.current = null;
+    setIsDetectingIpLocation(false);
 
     if (!isValidCep(normalizedCep)) {
       setStatus("error");
@@ -321,8 +378,8 @@ export function StoreLocator() {
 
       const storesByDistance = getStoresByDistance(result.coordinates);
       setUserLocation(result.coordinates);
-      setGeocodedLabel(result.label);
-      setSearchedCep(formatCep(normalizedCep));
+      setLocationContext({ source: "cep", label: result.label });
+
       setSelectedStoreId(storesByDistance[0]?.id);
       setStatus("success");
     } catch (error) {
@@ -385,22 +442,17 @@ export function StoreLocator() {
 
             <p className="text-sm font-semibold text-[#5F5F5A]">
               {activeMode === "stores"
-                ? "Busque por CEP para ordenar lojas por distância."
+                ? storeSearchHint
                 : "Selecione estado e cidade para encontrar o representante."}
             </p>
           </div>
 
           {activeMode === "stores" ? (
-            <form className="grid gap-5 md:grid-cols-[1fr_auto] md:items-end" onSubmit={handleStoreSubmit}>
-              <div className="flex flex-col gap-3">
-                <div className="inline-flex w-fit items-center gap-2 rounded-full bg-[#B11116]/10 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] text-[#B11116]">
-                  <ShieldCheck className="h-3.5 w-3.5" aria-hidden />
-                  Busca por CEP
-                </div>
-
-                <label className="flex flex-col gap-2">
-                  <span className="text-sm font-bold text-[#1C1C1C]">Digite seu CEP</span>
-                  <div className="flex h-14 items-center gap-3 rounded-[8px] border border-[#DEDED6] bg-[#FCFCF7] px-4 transition-colors focus-within:border-[#B11116]">
+            <form className="flex flex-col gap-3" onSubmit={handleStoreSubmit}>
+              <label className="flex flex-col gap-2">
+                <span className="text-sm font-bold text-[#1C1C1C]">Digite seu CEP</span>
+                <div className="flex flex-col items-stretch gap-3 md:flex-row md:items-center">
+                  <div className="flex h-14 flex-1 items-center gap-3 rounded-[8px] border border-[#DEDED6] bg-[#FCFCF7] px-4 transition-colors focus-within:border-[#B11116] md:min-w-[280px]">
                     <MapPin className="h-5 w-5 text-[#B11116]" aria-hidden />
                     <input
                       autoComplete="postal-code"
@@ -414,34 +466,21 @@ export function StoreLocator() {
                       value={formatCep(cep)}
                     />
                   </div>
-                </label>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  {DEMO_CEPS.map((demoCep) => (
-                    <button
-                      className="rounded-full border border-[#EBEBEB] px-3 py-2 text-xs font-bold text-[#5F5F5A] transition-colors hover:border-[#B11116]/30 hover:text-[#B11116]"
-                      key={demoCep.cep}
-                      onClick={() => void runSearch(demoCep.cep)}
-                      type="button"
-                    >
-                      {demoCep.label}
-                    </button>
-                  ))}
+                  <button
+                    className="inline-flex h-12 w-fit shrink-0 items-center justify-center gap-2 rounded-full bg-[#B11116] px-5 text-xs font-black uppercase tracking-[0.08em] text-white shadow-[0_20px_45px_-22px_rgba(177,17,22,0.9)] transition-all hover:-translate-y-0.5 hover:bg-[#A00010] disabled:cursor-not-allowed disabled:opacity-65 disabled:hover:translate-y-0 md:h-14 md:w-auto md:px-6 md:text-sm"
+                    disabled={status === "loading"}
+                    type="submit"
+                  >
+                    {status === "loading" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                    ) : (
+                      <Search className="h-4 w-4" aria-hidden />
+                    )}
+                    Localizar
+                  </button>
                 </div>
-              </div>
-
-              <button
-                className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-[#B11116] px-7 text-sm font-black uppercase tracking-[0.08em] text-white shadow-[0_20px_45px_-22px_rgba(177,17,22,0.9)] transition-all hover:-translate-y-0.5 hover:bg-[#A00010] disabled:cursor-not-allowed disabled:opacity-65 disabled:hover:translate-y-0"
-                disabled={status === "loading"}
-                type="submit"
-              >
-                {status === "loading" ? (
-                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                ) : (
-                  <Search className="h-4 w-4" aria-hidden />
-                )}
-                Localizar
-              </button>
+              </label>
             </form>
           ) : (
             <div className="grid gap-5 md:grid-cols-[1fr_1fr_auto] md:items-end">
@@ -501,37 +540,15 @@ export function StoreLocator() {
 
         {activeMode === "stores" ? (
           <motion.div className="grid gap-6 lg:grid-cols-[420px_minmax(0,1fr)]" variants={itemVariants}>
-            <aside className="flex flex-col gap-4">
-              <div className="grid grid-cols-3 gap-3">
-                <div className="rounded-[8px] border border-[#E7E7DE] bg-white p-4">
-                  <span className="text-[11px] font-black uppercase tracking-[0.12em] text-[#8C8C84]">Lojas</span>
-                  <strong className="mt-1 block text-2xl text-[#1C1C1C]">{MOCK_STORES.length}</strong>
+            <aside className="order-2 flex flex-col gap-4 lg:order-1">
+              {status === "error" ? (
+                <div
+                  aria-live="polite"
+                  className="rounded-[8px] border border-[#B11116]/25 bg-[#B11116]/10 p-4 text-sm font-semibold text-[#B11116]"
+                >
+                  {errorMessage}
                 </div>
-                <div className="rounded-[8px] border border-[#E7E7DE] bg-white p-4">
-                  <span className="text-[11px] font-black uppercase tracking-[0.12em] text-[#8C8C84]">Estados</span>
-                  <strong className="mt-1 block text-2xl text-[#1C1C1C]">{storeStateCount}</strong>
-                </div>
-                <div className="rounded-[8px] border border-[#E7E7DE] bg-white p-4">
-                  <span className="text-[11px] font-black uppercase tracking-[0.12em] text-[#8C8C84]">Mais perto</span>
-                  <strong className="mt-1 block truncate text-2xl text-[#1C1C1C]">
-                    {nearestStore ? nearestStore.state : "--"}
-                  </strong>
-                </div>
-              </div>
-
-              <div
-                aria-live="polite"
-                className={`rounded-[8px] border p-4 text-sm font-semibold ${
-                  status === "error"
-                    ? "border-[#B11116]/25 bg-[#B11116]/10 text-[#B11116]"
-                    : "border-[#E7E7DE] bg-white text-[#5F5F5A]"
-                }`}
-              >
-                {status === "error" ? errorMessage : storeStatusCopy}
-                {status === "success" && geocodedLabel ? (
-                  <span className="mt-1 block truncate text-xs font-medium text-[#8C8C84]">{geocodedLabel}</span>
-                ) : null}
-              </div>
+              ) : null}
 
               <div className="flex flex-col gap-3">
                 {visibleStores.map((store, index) => (
@@ -546,12 +563,14 @@ export function StoreLocator() {
               </div>
             </aside>
 
-            <div className="min-h-[520px] overflow-hidden rounded-[8px] border border-[#DADAD1] bg-white shadow-[0_30px_90px_-55px_rgba(28,28,28,0.65)] lg:sticky lg:top-28 lg:h-[calc(100vh-8rem)]">
+            <div className="relative z-0 isolate order-1 min-h-[520px] overflow-hidden rounded-[8px] border border-[#DADAD1] bg-white shadow-[0_30px_90px_-55px_rgba(28,28,28,0.65)] lg:sticky lg:top-28 lg:order-2 lg:h-[calc(100vh-8rem)]">
               <LazyStoreLocatorMap
                 onSelectStore={setSelectedStoreId}
                 selectedStoreId={selectedStore?.id}
                 stores={visibleStores}
                 userLocation={userLocation}
+                userLocationLabel={locationContext?.label}
+                userLocationSource={locationContext?.source}
               />
             </div>
           </motion.div>

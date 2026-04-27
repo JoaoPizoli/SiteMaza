@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect } from "react";
-import { X, MapPin, User, Search, ArrowUpRight } from "lucide-react";
+import { X, MapPin, User, ArrowUpRight } from "lucide-react";
 import { motion, Variants } from "framer-motion";
 
 interface MobileMenuProps {
@@ -94,19 +94,6 @@ export function MobileMenu({ onClose }: MobileMenuProps) {
           animate="visible"
           className="flex-1 px-6 py-6 flex flex-col gap-8"
         >
-          {/* Busca */}
-          <motion.label
-            variants={itemVariants}
-            className="flex items-center gap-3 h-12 px-4 rounded-full bg-white/5 border border-white/10 focus-within:border-[#FBB943]/60 transition-colors"
-          >
-            <Search className="w-4 h-4 text-white/60" aria-hidden />
-            <input
-              type="search"
-              placeholder="Buscar produtos..."
-              className="flex-1 bg-transparent outline-none text-[14px] placeholder:text-white/50"
-            />
-          </motion.label>
-
           {/* Links principais */}
           <nav aria-label="Navegação principal" className="flex flex-col">
             {NAV_LINKS.map((l) => (
