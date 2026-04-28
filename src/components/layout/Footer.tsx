@@ -133,7 +133,7 @@ export function Footer() {
                 <Link href="/onde-encontrar" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
                   Onde encontrar
                 </Link>
-                <Link href="/area-cliente" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                <Link href="https://portal.maza.com.br/" target="_blank" rel="noopener noreferrer" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
                   Área do cliente
                 </Link>
                 <Link href="/trabalhe-conosco" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">

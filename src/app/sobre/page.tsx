@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { motion, Variants } from "framer-motion";
-import { type LucideIcon, Eye, Target, Heart, ShieldCheck, Leaf } from "lucide-react";
+import { type LucideIcon, Eye, Target, Heart, Leaf } from "lucide-react";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -92,107 +92,76 @@ export default function AboutPage() {
   return (
     <main className="w-full bg-white font-roboto">
       {/* HERO */}
-      <section className="relative w-full pt-[160px] pb-24 px-6 xl:px-10 overflow-hidden">
-        <div
-          aria-hidden
-          className="absolute inset-0 -z-10 bg-gradient-to-b from-[#FCFCF7] via-white to-white"
+      <section className="relative isolate flex min-h-[780px] w-full items-center overflow-hidden px-6 py-24 pt-[160px] xl:px-10">
+        <Image
+          src="/assets/about/fabrica.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="absolute inset-0 -z-20 object-cover object-center"
         />
         <div
           aria-hidden
-          className="absolute top-10 -left-32 w-[520px] h-[520px] rounded-full blur-3xl opacity-40 -z-10"
-          style={{ background: "radial-gradient(circle, rgba(251,185,67,0.3) 0%, transparent 70%)" }}
-        />
-        <div
-          aria-hidden
-          className="absolute top-20 -right-32 w-[500px] h-[500px] rounded-full blur-3xl opacity-30 -z-10"
-          style={{ background: "radial-gradient(circle, rgba(177,17,22,0.25) 0%, transparent 70%)" }}
+          className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(28,28,28,0.72)_0%,rgba(28,28,28,0.48)_46%,rgba(28,28,28,0.18)_100%)]"
         />
 
         <motion.div
-          className="w-full max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center"
+          className="mx-auto w-full max-w-[1440px]"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
         >
-          <div className="flex flex-col gap-8">
-            <motion.div variants={itemVariants}>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(251,185,67,0.15)] border border-[rgba(251,185,67,0.35)] w-fit">
-                <span className="font-black text-[12px] tracking-[0.14em] text-[#B11116]">
-                  QUEM SOMOS
-                </span>
-              </div>
-            </motion.div>
-
-            <motion.h1
-              variants={itemVariants}
-              className="font-bold text-[44px] md:text-[60px] lg:text-[72px] leading-[1.05] tracking-[-0.02em] text-[#1C1C1C]"
-            >
-              Conheça a <span className="text-[#B11116]">Maza</span>.
-            </motion.h1>
-
-            <motion.p
-              variants={itemVariants}
-              className="text-[#5F5F5A] text-[16px] lg:text-[17px] leading-[1.7] max-w-[590px]"
-            >
-              Há 27 anos no mercado a Tintas Maza se destaca na fabricação de tintas
-              imobiliárias, automotivas, industriais e solventes. Com sua fábrica instalada
-              na cidade de Mococa-SP, a Maza cada vez mais investe em novas tecnologias e
-              inovações, para entregar aos seus consumidores e clientes produtos com qualidade
-              garantida, responsabilidade ambiental e serviços excelentes.
-            </motion.p>
-
-            <motion.p
-              variants={itemVariants}
-              className="text-[#5F5F5A] text-[16px] leading-[1.7] max-w-[590px]"
-            >
-              Sempre buscando diferenciais, a Maza tem um dos maiores portfolios de tintas do
-              mercado para todos os fins. É assim com muito trabalho, pessoas comprometidas,
-              produtos de qualidade e compromisso com o sucesso de nossos clientes que
-              continuamos a nossa história...
-            </motion.p>
-
-            <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-[#EBEBEB]">
-              {STATS.map((s) => (
-                <div key={s.label} className="flex flex-col gap-1">
-                  <span className="font-bold text-[28px] lg:text-[34px] leading-none text-[#B11116]">
-                    {s.value}
+          <div className="flex w-full justify-start">
+            <div className="flex w-full max-w-[690px] flex-col gap-8 rounded-3xl bg-white p-6 shadow-[0_30px_90px_-35px_rgba(0,0,0,0.55)] md:p-10 lg:p-12">
+              <motion.div variants={itemVariants}>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(251,185,67,0.15)] border border-[rgba(251,185,67,0.35)] w-fit">
+                  <span className="font-black text-[12px] tracking-[0.14em] text-[#B11116]">
+                    QUEM SOMOS
                   </span>
-                  <span className="text-[12px] text-[#5F5F5A] leading-snug">{s.label}</span>
                 </div>
-              ))}
-            </motion.div>
-          </div>
+              </motion.div>
 
-          <motion.div
-            variants={itemVariants}
-            className="relative w-full aspect-[669/493] rounded-3xl overflow-hidden shadow-[0_30px_80px_-30px_rgba(0,0,0,0.3)]"
-          >
-            <Image
-              src="/assets/about/about-hero.png"
-              alt="Fábrica Maza em Mococa-SP"
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
-            />
-            <div
-              aria-hidden
-              className="absolute inset-0 bg-gradient-to-t from-[#B11116]/40 via-transparent to-transparent"
-            />
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.6 }}
-              className="absolute bottom-5 left-5 right-5 md:bottom-6 md:left-6 md:right-auto bg-white/95 backdrop-blur-md rounded-2xl p-5 flex items-center gap-4 shadow-xl max-w-sm"
-            >
-              <div className="w-12 h-12 rounded-xl bg-[#B11116] grid place-items-center flex-shrink-0">
-                <ShieldCheck className="w-6 h-6 text-white" aria-hidden />
-              </div>
-              <div>
-                <span className="block text-[12px] text-[#5F5F5A]">Produção em</span>
-                <span className="block font-bold text-[15px] text-[#1C1C1C]">Mococa — São Paulo</span>
-              </div>
-            </motion.div>
-          </motion.div>
+              <motion.h1
+                variants={itemVariants}
+                className="font-bold text-[44px] md:text-[60px] lg:text-[72px] leading-[1.05] tracking-[-0.02em] text-[#1C1C1C]"
+              >
+                Conheça a <span className="text-[#B11116]">Maza</span>.
+              </motion.h1>
+
+              <motion.p
+                variants={itemVariants}
+                className="text-[#5F5F5A] text-[16px] lg:text-[17px] leading-[1.7] max-w-[590px]"
+              >
+                Há 27 anos no mercado a Tintas Maza se destaca na fabricação de tintas
+                imobiliárias, automotivas, industriais e solventes. Com sua fábrica instalada
+                na cidade de Mococa-SP, a Maza cada vez mais investe em novas tecnologias e
+                inovações, para entregar aos seus consumidores e clientes produtos com qualidade
+                garantida, responsabilidade ambiental e serviços excelentes.
+              </motion.p>
+
+              <motion.p
+                variants={itemVariants}
+                className="text-[#5F5F5A] text-[16px] leading-[1.7] max-w-[590px]"
+              >
+                Sempre buscando diferenciais, a Maza tem um dos maiores portfolios de tintas do
+                mercado para todos os fins. É assim com muito trabalho, pessoas comprometidas,
+                produtos de qualidade e compromisso com o sucesso de nossos clientes que
+                continuamos a nossa história...
+              </motion.p>
+
+              <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-[#EBEBEB]">
+                {STATS.map((s) => (
+                  <div key={s.label} className="flex flex-col gap-1">
+                    <span className="font-bold text-[28px] lg:text-[34px] leading-none text-[#B11116]">
+                      {s.value}
+                    </span>
+                    <span className="text-[12px] text-[#5F5F5A] leading-snug">{s.label}</span>
+                  </div>
+                ))}
+              </motion.div>
+            </div>
+          </div>
         </motion.div>
       </section>
 
@@ -354,7 +323,7 @@ export default function AboutPage() {
       </section>
 
       {/* CERTIFICADOS */}
-      <section className="w-full pb-24 lg:pb-32 px-6 xl:px-10">
+      <section className="w-full pt-16 lg:pt-20 pb-24 lg:pb-32 px-6 xl:px-10">
         <motion.div
           className="w-full max-w-[1440px] mx-auto flex flex-col items-center gap-14"
           initial="hidden"

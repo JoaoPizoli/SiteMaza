@@ -38,7 +38,6 @@ export function Navbar() {
 
   // Páginas com conteúdo claro abaixo precisam de nav escura desde o topo.
   const isLightPage =
-    pathname === "/sobre" ||
     pathname?.startsWith("/produtos") ||
     pathname?.startsWith("/produto");
 
@@ -201,7 +200,9 @@ export function Navbar() {
             </Link>
 
             <Link
-              href="/area-cliente"
+              href="https://portal.maza.com.br/"
+              target="_blank"
+              rel="noopener noreferrer"
               className={cn(
                 "inline-flex items-center gap-2 h-10 px-4 rounded-full text-[14px] font-semibold transition-all shadow-sm",
                 solid
