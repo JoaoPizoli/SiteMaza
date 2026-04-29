@@ -166,15 +166,15 @@ function ProductCard({ title, image, href, desc }: ProductCardProps) {
         />
 
         {/* Conteúdo */}
-        <div className="absolute inset-0 p-7 lg:p-8 flex flex-col justify-end">
-          <div className="flex items-end justify-between gap-4">
-            <div className="flex flex-col gap-1">
-              <h3 className="font-roboto font-bold text-[26px] lg:text-[32px] text-white leading-tight">
+        <div className="absolute inset-0 p-5 sm:p-7 lg:p-8 flex flex-col justify-end">
+          <div className="flex items-end justify-between gap-3 sm:gap-4">
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <h3 className="font-roboto font-bold text-[22px] sm:text-[26px] lg:text-[32px] text-white leading-tight break-words [overflow-wrap:anywhere]">
                 {title}
               </h3>
-              <p className="text-white/70 text-[14px] max-w-[320px]">{desc}</p>
+              <p className="text-white/70 text-[13px] sm:text-[14px] max-w-[320px]">{desc}</p>
             </div>
-            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#FBB943] text-[#1C1C1C] grid place-items-center shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
+            <div className="shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#FBB943] text-[#1C1C1C] grid place-items-center shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">
               <ArrowUpRight className="w-5 h-5" aria-hidden />
             </div>
           </div>

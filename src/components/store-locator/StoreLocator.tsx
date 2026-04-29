@@ -22,7 +22,6 @@ import { geolocateByIp } from "@/lib/ip-location";
 import { geocodeCepWithNominatim, type GeocodedCep } from "@/lib/nominatim";
 import {
 
-  MOCK_REPRESENTATIVES,
   MOCK_STORES,
   formatCep,
   formatDistance,
@@ -578,7 +577,7 @@ export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorPr
             </div>
           </motion.div>
         ) : (
-          <motion.div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]" variants={itemVariants}>
+          <motion.div className="grid gap-6" variants={itemVariants}>
             <div className="grid gap-4 md:grid-cols-2">
               {representatives.length > 0 ? (
                 representatives.map((representative) => (
@@ -590,35 +589,6 @@ export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorPr
                 </div>
               )}
             </div>
-
-            <aside className="flex h-fit flex-col gap-4 rounded-[8px] border border-[#E7E7DE] bg-white p-5 lg:sticky lg:top-28">
-              <span className="inline-flex w-fit items-center gap-2 rounded-full bg-[#B11116]/10 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] text-[#B11116]">
-                <Users className="h-3.5 w-3.5" aria-hidden />
-                Representantes
-              </span>
-              <div>
-                <strong className="block text-3xl text-[#1C1C1C]">{representatives.length}</strong>
-                <p className="mt-1 text-sm leading-relaxed text-[#5F5F5A]">
-                  {representativeState
-                    ? `Resultado para ${representativeCity || `todas as cidades de ${representativeState}`}.`
-                    : "Selecione um estado para refinar a busca."}
-                </p>
-              </div>
-              <div className="grid gap-2 border-t border-[#F1F1EA] pt-4 text-sm text-[#5F5F5A]">
-                <span className="flex justify-between gap-3">
-                  <span>Total mockado</span>
-                  <strong className="text-[#1C1C1C]">{MOCK_REPRESENTATIVES.length}</strong>
-                </span>
-                <span className="flex justify-between gap-3">
-                  <span>Estados atendidos</span>
-                  <strong className="text-[#1C1C1C]">{representativeStates.length}</strong>
-                </span>
-                <span className="flex justify-between gap-3">
-                  <span>Cidades no filtro</span>
-                  <strong className="text-[#1C1C1C]">{representativeCities.length || "--"}</strong>
-                </span>
-              </div>
-            </aside>
           </motion.div>
         )}
       </motion.div>

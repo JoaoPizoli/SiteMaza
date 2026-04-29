@@ -282,7 +282,6 @@ export function HeroSection() {
         data-gsap-hero-item
         className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 text-white/70 hover:text-white transition-colors"
       >
-        <span className="text-[11px] uppercase tracking-[0.2em]">Role</span>
         <span
           data-gsap-scroll-cue
           className="flex items-center justify-center w-9 h-9 rounded-full border border-white/25 bg-white/5 backdrop-blur-sm"

@@ -90,8 +90,8 @@ export function AboutSection() {
                 data-gsap-reveal
                 className="group flex items-start gap-3 p-4 rounded-xl bg-white border border-[#EBEBEB] hover:border-[#B11116]/30 hover:shadow-[0_8px_30px_-10px_rgba(177,17,22,0.15)] transition-all"
               >
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-[#B11116]/8 text-[#B11116] grid place-items-center group-hover:bg-[#B11116] group-hover:text-white transition-colors">
-                  <Icon className="w-5 h-5" aria-hidden />
+                <div className="flex-shrink-0 text-[#B11116]">
+                  <Icon className="w-6 h-6" aria-hidden />
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <span className="font-semibold text-[14px] text-[#1C1C1C]">{title}</span>

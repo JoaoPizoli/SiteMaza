@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { type MouseEvent, useEffect, useState } from "react";
 import { Menu, MapPin, User, ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
@@ -55,6 +55,17 @@ export function Navbar() {
     ? "/assets/figma/logo-maza.svg"
     : "/assets/navbar/logo-maza.png";
 
+  function handleLogoClick(event: MouseEvent<HTMLAnchorElement>) {
+    if (pathname !== "/") {
+      return;
+    }
+
+    event.preventDefault();
+    setOpenDropdown(null);
+    window.history.replaceState(null, "", "/");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   return (
     <>
       <motion.header
@@ -75,6 +86,7 @@ export function Navbar() {
           {/* Logo */}
           <Link
             href="/"
+            onClick={handleLogoClick}
             aria-label="Página inicial Tintas Maza"
             className="flex-shrink-0 group"
           >
