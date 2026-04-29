@@ -7,7 +7,36 @@ export const metadata: Metadata = {
   description: "Encontre a loja física, revenda ou representante Maza mais próximo.",
 };
 
-export default function FindUsPage() {
+type FindUsSearchParams = {
+  tipo?: string | string[];
+  modo?: string | string[];
+  tab?: string | string[];
+};
+
+type FindUsPageProps = {
+  searchParams?: Promise<FindUsSearchParams>;
+};
+
+function getFirstParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function getInitialLocatorMode(searchParams: FindUsSearchParams | undefined) {
+  const requestedMode = (
+    getFirstParam(searchParams?.tipo) ??
+    getFirstParam(searchParams?.modo) ??
+    getFirstParam(searchParams?.tab)
+  )?.toLowerCase();
+
+  return requestedMode === "representantes" || requestedMode === "representatives"
+    ? "representatives"
+    : "stores";
+}
+
+export default async function FindUsPage({ searchParams }: FindUsPageProps) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const initialMode = getInitialLocatorMode(resolvedSearchParams);
+
   return (
     <main className="w-full bg-[#FCFCF7] font-roboto">
       <section className="relative isolate flex min-h-[560px] w-full items-end overflow-hidden px-6 pb-40 pt-[160px] xl:px-10">
@@ -51,7 +80,7 @@ export default function FindUsPage() {
         </div>
       </section>
 
-      <StoreLocator />
+      <StoreLocator initialMode={initialMode} />
     </main>
   );
 }

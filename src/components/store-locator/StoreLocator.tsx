@@ -34,7 +34,6 @@ import {
   normalizeCep,
   type GeoPoint,
   type RepresentativeLocation,
-  type StoreChannel,
   type StoreWithDistance,
 } from "@/lib/store-locator";
 import type { StoreLocatorMapProps } from "./StoreLocatorMap";
@@ -64,17 +63,15 @@ const itemVariants: Variants = {
   },
 };
 
-const CHANNEL_LABEL: Record<StoreChannel, string> = {
-  distribuidor: "Distribuidor",
-  revenda: "Revenda",
-  showroom: "Showroom",
-};
-
-type LocatorMode = "stores" | "representatives";
+export type LocatorMode = "stores" | "representatives";
 type SearchStatus = "idle" | "loading" | "success" | "error";
 type LocationContext = {
   source: "cep" | "ip";
   label: string;
+};
+
+type StoreLocatorProps = {
+  initialMode?: LocatorMode;
 };
 
 function MapLoadingState() {
@@ -138,9 +135,11 @@ function StoreCard({
         </span>
         <span className="min-w-0 flex-1">
           <span className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#FBB943]/20 px-2 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[#7A0B0F]">
-              <Store className="h-3 w-3" aria-hidden />
-              {CHANNEL_LABEL[store.channel]}
+            <span
+              aria-label="Loja física"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#FBB943]/20 text-[#7A0B0F]"
+            >
+              <Store className="h-3.5 w-3.5" aria-hidden />
             </span>
             <span className="text-xs font-bold text-[#B11116]">{formatDistance(store.distanceKm)}</span>
           </span>
@@ -246,8 +245,8 @@ function RepresentativeCard({ representative }: Readonly<{ representative: Repre
   );
 }
 
-export function StoreLocator() {
-  const [activeMode, setActiveMode] = useState<LocatorMode>("stores");
+export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorProps>) {
+  const [activeMode, setActiveMode] = useState<LocatorMode>(initialMode);
   const [cep, setCep] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -263,6 +262,10 @@ export function StoreLocator() {
   const ipLocationAbortRef = useRef<AbortController | null>(null);
   const hasManualLocationSearchRef = useRef(false);
   const cacheRef = useRef(new Map<string, GeocodedCep>());
+
+  useEffect(() => {
+    setActiveMode(initialMode);
+  }, [initialMode]);
 
   useEffect(() => () => abortRef.current?.abort(), []);
 
@@ -403,7 +406,7 @@ export function StoreLocator() {
   }
 
   return (
-    <section className="w-full bg-[#FCFCF7] px-6 py-12 lg:py-16 xl:px-10">
+    <section id="localizador" className="w-full scroll-mt-28 bg-[#FCFCF7] px-6 py-12 lg:py-16 xl:px-10">
       <motion.div
         className="mx-auto flex w-full max-w-[1440px] flex-col gap-8"
         initial="hidden"

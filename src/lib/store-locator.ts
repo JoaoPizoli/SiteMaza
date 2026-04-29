@@ -1,8 +1,6 @@
 import distance from "@turf/distance";
 import { point } from "@turf/helpers";
 
-export type StoreChannel = "revenda" | "showroom" | "distribuidor";
-
 export interface GeoPoint {
   lat: number;
   lng: number;
@@ -11,7 +9,6 @@ export interface GeoPoint {
 export interface StoreLocation {
   id: string;
   name: string;
-  channel: StoreChannel;
   address: string;
   city: string;
   state: string;
@@ -45,7 +42,6 @@ export const MOCK_STORES: StoreLocation[] = [
   {
     id: "maza-mococa-centro",
     name: "Maza Tintas - Mococa Centro",
-    channel: "showroom",
     address: "Rua Capitao Miguel Ferreira, 105",
     city: "Mococa",
     state: "SP",
@@ -59,7 +55,6 @@ export const MOCK_STORES: StoreLocation[] = [
   {
     id: "maza-ribeirao-preto",
     name: "Revenda Maza - Ribeirão Preto",
-    channel: "revenda",
     address: "Av. Presidente Vargas, 1472",
     city: "Ribeirão Preto",
     state: "SP",
@@ -73,7 +68,6 @@ export const MOCK_STORES: StoreLocation[] = [
   {
     id: "maza-franca",
     name: "Revenda Maza - Franca",
-    channel: "revenda",
     address: "Av. Brasil, 2500",
     city: "Franca",
     state: "SP",
@@ -87,7 +81,6 @@ export const MOCK_STORES: StoreLocation[] = [
   {
     id: "maza-campinas",
     name: "Distribuidor Maza - Campinas",
-    channel: "distribuidor",
     address: "Av. Orosimbo Maia, 960",
     city: "Campinas",
     state: "SP",
@@ -101,7 +94,6 @@ export const MOCK_STORES: StoreLocation[] = [
   {
     id: "maza-sao-paulo",
     name: "Parceiro Maza - São Paulo",
-    channel: "revenda",
     address: "Rua Vergueiro, 2045",
     city: "São Paulo",
     state: "SP",
@@ -115,7 +107,6 @@ export const MOCK_STORES: StoreLocation[] = [
   {
     id: "maza-belo-horizonte",
     name: "Distribuidor Maza - Belo Horizonte",
-    channel: "distribuidor",
     address: "Av. Afonso Pena, 1500",
     city: "Belo Horizonte",
     state: "MG",
@@ -129,7 +120,6 @@ export const MOCK_STORES: StoreLocation[] = [
   {
     id: "maza-pocos-caldas",
     name: "Representante Maza - Poços de Caldas",
-    channel: "revenda",
     address: "Rua Prefeito Chagas, 305",
     city: "Poços de Caldas",
     state: "MG",
@@ -143,7 +133,6 @@ export const MOCK_STORES: StoreLocation[] = [
   {
     id: "maza-curitiba",
     name: "Revenda Maza - Curitiba",
-    channel: "revenda",
     address: "Rua XV de Novembro, 621",
     city: "Curitiba",
     state: "PR",
@@ -157,7 +146,6 @@ export const MOCK_STORES: StoreLocation[] = [
   {
     id: "maza-rio-de-janeiro",
     name: "Parceiro Maza - Rio de Janeiro",
-    channel: "revenda",
     address: "Rua da Assembleia, 77",
     city: "Rio de Janeiro",
     state: "RJ",

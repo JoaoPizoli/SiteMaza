@@ -142,8 +142,8 @@ export function useGsapHero(scope: ScopeRef) {
 
       tl.fromTo(
         heroLayers,
-        { autoAlpha: 0, scale: 0.94 },
-        { autoAlpha: 1, scale: 1, duration: 1.15, stagger: 0.08 },
+        { autoAlpha: 0 },
+        { autoAlpha: 1, duration: 1.15, stagger: 0.08 },
         0
       );
 

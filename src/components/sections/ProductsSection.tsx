@@ -3,14 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowUpRight,
-  CarFront,
-  Droplets,
-  House,
-  Wrench,
-  type LucideIcon,
-} from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import {
   useGsapMagneticCards,
   useGsapReveal,
@@ -19,28 +12,24 @@ import {
 const PRODUCT_LINES = [
   {
     title: "Imobiliária",
-    icon: House,
     image: "/assets/figma/imobiliaria.png",
     href: "/produtos?category=imobiliaria&subcategory=Acabamentos",
     desc: "Tintas para residências e acabamentos profissionais.",
   },
   {
     title: "Automotivo",
-    icon: CarFront,
     image: "/assets/figma/automotivo.png",
     href: "/produtos?category=automotiva&subcategory=Adesivos",
     desc: "Alta performance e acabamento impecável para veículos.",
   },
   {
     title: "Industrial",
-    icon: Wrench,
     image: "/assets/figma/industrial.png",
     href: "/produtos?category=industrial&subcategory=Anticorrosivos",
     desc: "Proteção avançada para ambientes severos.",
   },
   {
     title: "Impermeabilizantes",
-    icon: Droplets,
     image: "/assets/figma/impermeabilizantes.png",
     href: "/produtos?category=impermeabilizantes&subcategory=Mantas%20L%C3%ADquidas",
     desc: "Proteção completa contra umidade e infiltrações.",
@@ -136,15 +125,12 @@ export function ProductsSection() {
 
 interface ProductCardProps {
   title: string;
-  icon: LucideIcon;
   image: string;
   href: string;
   desc: string;
 }
 
-function ProductCard({ title, icon, image, href, desc }: ProductCardProps) {
-  const Icon = icon;
-
+function ProductCard({ title, image, href, desc }: ProductCardProps) {
   return (
     <div data-gsap-reveal>
       <Link
@@ -180,13 +166,7 @@ function ProductCard({ title, icon, image, href, desc }: ProductCardProps) {
         />
 
         {/* Conteúdo */}
-        <div className="absolute inset-0 p-7 lg:p-8 flex flex-col justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-md bg-white/90 backdrop-blur-md border border-white/35 text-[#B11116] grid place-items-center shadow-[0_10px_30px_-18px_rgba(0,0,0,0.6)] transition-colors duration-300 group-hover:bg-white group-hover:text-[#B11116]">
-              <Icon className="w-5 h-5" strokeWidth={1.9} aria-hidden />
-            </div>
-          </div>
-
+        <div className="absolute inset-0 p-7 lg:p-8 flex flex-col justify-end">
           <div className="flex items-end justify-between gap-4">
             <div className="flex flex-col gap-1">
               <h3 className="font-roboto font-bold text-[26px] lg:text-[32px] text-white leading-tight">

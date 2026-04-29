@@ -15,7 +15,7 @@ const NAV_LINKS: { label: string; href: string }[] = [
   { label: "Sobre a Maza", href: "/sobre" },
   { label: "Linha de produtos", href: "/produtos" },
   { label: "Onde encontrar", href: "/onde-encontrar" },
-  { label: "Representantes", href: "/onde-encontrar" },
+  { label: "Onde Encontrar", href: "/onde-encontrar" },
 ];
 
 const listVariants: Variants = {

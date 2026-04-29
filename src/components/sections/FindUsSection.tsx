@@ -87,7 +87,7 @@ export function FindUsSection() {
 
             <div data-gsap-reveal className="relative z-10 flex flex-col sm:flex-row gap-4">
               <Link
-                href="/onde-encontrar"
+                href="/onde-encontrar#localizador"
                 className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-white text-[#1C1C1C] font-semibold text-[14px] tracking-[0.03em] hover:bg-[#FBB943] transition-colors shadow-xl"
               >
                 <MapPin className="w-4 h-4" aria-hidden />
@@ -96,7 +96,7 @@ export function FindUsSection() {
               </Link>
 
               <Link
-                href="/onde-encontrar"
+                href="/onde-encontrar?tipo=representantes#localizador"
                 className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-white/10 border border-white/25 backdrop-blur-md text-white font-semibold text-[14px] tracking-[0.03em] hover:bg-white/20 transition-colors"
               >
                 <Users className="w-4 h-4" aria-hidden />

@@ -21,8 +21,12 @@ export function HeroSection() {
     <section
       ref={sectionRef}
       aria-label="Apresentação Tintas Maza"
-      className="relative w-full min-h-[760px] lg:min-h-[860px] flex items-center justify-center overflow-hidden isolate bg-[#0b0306]"
+      className="relative w-full min-h-[760px] lg:min-h-[860px] flex items-center justify-center overflow-hidden isolate bg-[#B11116]"
     >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-28 bg-gradient-to-b from-[#C9161D] via-[#C9161D]/90 to-transparent"
+      />
       {/* Camada 1 — gradiente base radial (vermelho profundo da marca) */}
       <div
         aria-hidden
@@ -30,7 +34,7 @@ export function HeroSection() {
         className="absolute inset-0 -z-10"
         style={{
           background:
-            "radial-gradient(120% 80% at 15% 20%, #B11116 0%, #7a0b0f 45%, #2a0306 80%, #0b0306 100%)",
+            "radial-gradient(120% 90% at 18% 8%, #C9161D 0%, #B11116 34%, #8D0E12 64%, #3A0508 100%)",
         }}
       />
 
@@ -81,7 +85,7 @@ export function HeroSection() {
         className="absolute inset-0 -z-10"
         style={{
           background:
-            "radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.55) 100%)",
+            "linear-gradient(180deg, transparent 0%, transparent 56%, rgba(0,0,0,0.42) 100%)",
         }}
       />
 
@@ -126,31 +130,12 @@ export function HeroSection() {
               <stop offset="48%" stopColor="#FFFFFF" stopOpacity="0.35" />
               <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
             </linearGradient>
-            <filter
-              id="maza-paint-blur"
-              x="-20%"
-              y="-60%"
-              width="140%"
-              height="220%"
-              colorInterpolationFilters="sRGB"
-            >
-              <feGaussianBlur stdDeviation="8" />
-            </filter>
           </defs>
 
           <path
             data-gsap-paint-path
             d="M -170 812 C 118 760 308 632 534 590 C 736 552 908 588 1054 678 C 1198 766 1386 774 1600 724"
             className="opacity-0"
-          />
-          <path
-            data-gsap-paint-shadow
-            d="M -170 826 C 118 776 306 652 536 612 C 738 576 898 610 1040 696 C 1192 784 1392 792 1600 744"
-            stroke="rgba(4,0,2,0.32)"
-            strokeWidth="76"
-            strokeLinecap="round"
-            filter="url(#maza-paint-blur)"
-            opacity="0.58"
           />
           <path
             data-gsap-paint-arc
@@ -248,7 +233,7 @@ export function HeroSection() {
             </Link>
 
             <Link
-              href="/onde-encontrar"
+              href="/onde-encontrar?tipo=representantes#localizador"
               className="group inline-flex items-center gap-2 py-2 text-white font-bold tracking-[0.03em] text-[15px] sm:text-[16px] border-b-2 border-white/30 hover:border-[#FBB943] transition-colors"
             >
               <span>ENCONTRE UM REPRESENTANTE</span>

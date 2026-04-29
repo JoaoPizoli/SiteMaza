@@ -27,7 +27,7 @@ const NAV_ITEMS: NavItem[] = [
       { label: "Impermeabilizantes", href: "/produtos?category=impermeabilizantes", description: "Proteção contra umidade" },
     ],
   },
-  { label: "Representantes", href: "/onde-encontrar" },
+  { label: "Onde Encontrar", href: "/onde-encontrar" },
 ];
 
 export function Navbar() {
