@@ -12,11 +12,7 @@ export interface StoreLocation {
   address: string;
   city: string;
   state: string;
-  cep: string;
   phone: string;
-  whatsapp: string;
-  email: string;
-  hours: string;
   coordinates: GeoPoint;
 }
 
@@ -25,17 +21,16 @@ export interface StoreWithDistance extends StoreLocation {
 }
 
 export interface RepresentativeLocation {
-  id: string;
   name: string;
   company: string;
   email: string;
   phone: string;
-  whatsapp: string;
-  state: string;
-  city: string;
-  address: string;
   serviceCities: string[];
-  productLines: string[];
+}
+
+export interface RepresentativeRegion {
+  state: string;
+  cities: string[];
 }
 
 export const MOCK_STORES: StoreLocation[] = [
@@ -45,11 +40,7 @@ export const MOCK_STORES: StoreLocation[] = [
     address: "Rua Capitao Miguel Ferreira, 105",
     city: "Mococa",
     state: "SP",
-    cep: "13730-000",
     phone: "(19) 3656-1234",
-    whatsapp: "551936561234",
-    email: "mococa@tintasmaza.com.br",
-    hours: "Seg a sex, 8h às 18h",
     coordinates: { lat: -21.4678, lng: -47.0044 },
   },
   {
@@ -58,11 +49,7 @@ export const MOCK_STORES: StoreLocation[] = [
     address: "Av. Presidente Vargas, 1472",
     city: "Ribeirão Preto",
     state: "SP",
-    cep: "14020-260",
     phone: "(16) 3620-9988",
-    whatsapp: "551636209988",
-    email: "ribeirao@tintasmaza.com.br",
-    hours: "Seg a sáb, 8h às 18h",
     coordinates: { lat: -21.1843, lng: -47.8062 },
   },
   {
@@ -71,11 +58,7 @@ export const MOCK_STORES: StoreLocation[] = [
     address: "Av. Brasil, 2500",
     city: "Franca",
     state: "SP",
-    cep: "14401-234",
     phone: "(16) 3700-1122",
-    whatsapp: "551637001122",
-    email: "franca@tintasmaza.com.br",
-    hours: "Seg a sex, 8h às 18h",
     coordinates: { lat: -20.5396, lng: -47.4019 },
   },
   {
@@ -84,11 +67,7 @@ export const MOCK_STORES: StoreLocation[] = [
     address: "Av. Orosimbo Maia, 960",
     city: "Campinas",
     state: "SP",
-    cep: "13010-211",
     phone: "(19) 3252-4400",
-    whatsapp: "551932524400",
-    email: "campinas@tintasmaza.com.br",
-    hours: "Seg a sex, 8h às 17h30",
     coordinates: { lat: -22.9056, lng: -47.0608 },
   },
   {
@@ -97,11 +76,7 @@ export const MOCK_STORES: StoreLocation[] = [
     address: "Rua Vergueiro, 2045",
     city: "São Paulo",
     state: "SP",
-    cep: "04101-000",
     phone: "(11) 3208-7711",
-    whatsapp: "551132087711",
-    email: "saopaulo@tintasmaza.com.br",
-    hours: "Seg a sáb, 8h às 19h",
     coordinates: { lat: -23.5747, lng: -46.6355 },
   },
   {
@@ -110,11 +85,7 @@ export const MOCK_STORES: StoreLocation[] = [
     address: "Av. Afonso Pena, 1500",
     city: "Belo Horizonte",
     state: "MG",
-    cep: "30130-005",
     phone: "(31) 3333-5566",
-    whatsapp: "553133335566",
-    email: "bh@tintasmaza.com.br",
-    hours: "Seg a sex, 8h às 18h",
     coordinates: { lat: -19.9208, lng: -43.9378 },
   },
   {
@@ -123,11 +94,7 @@ export const MOCK_STORES: StoreLocation[] = [
     address: "Rua Prefeito Chagas, 305",
     city: "Poços de Caldas",
     state: "MG",
-    cep: "37701-010",
     phone: "(35) 3722-9090",
-    whatsapp: "553537229090",
-    email: "pocos@tintasmaza.com.br",
-    hours: "Seg a sex, 8h às 18h",
     coordinates: { lat: -21.7854, lng: -46.5614 },
   },
   {
@@ -136,11 +103,7 @@ export const MOCK_STORES: StoreLocation[] = [
     address: "Rua XV de Novembro, 621",
     city: "Curitiba",
     state: "PR",
-    cep: "80020-310",
     phone: "(41) 3015-8844",
-    whatsapp: "554130158844",
-    email: "curitiba@tintasmaza.com.br",
-    hours: "Seg a sex, 8h às 18h",
     coordinates: { lat: -25.4284, lng: -49.2733 },
   },
   {
@@ -149,108 +112,112 @@ export const MOCK_STORES: StoreLocation[] = [
     address: "Rua da Assembleia, 77",
     city: "Rio de Janeiro",
     state: "RJ",
-    cep: "20011-001",
     phone: "(21) 2509-7755",
-    whatsapp: "552125097755",
-    email: "rio@tintasmaza.com.br",
-    hours: "Seg a sex, 8h às 18h",
     coordinates: { lat: -22.9068, lng: -43.1729 },
   },
 ];
 
 export const MOCK_REPRESENTATIVES: RepresentativeLocation[] = [
   {
-    id: "rep-farini-mg",
     name: "Ricardo S. Farini",
     company: "Farini Representação Comercial Ltda.",
     email: "diretoria@amazonfortimp.com.br",
     phone: "(19) 99159-4165",
-    whatsapp: "5519991594165",
-    state: "MG",
-    city: "Poços de Caldas",
-    address: "Rua XXX, 35 - Poços de Caldas/MG - CEP 37704-365",
     serviceCities: ["Poços de Caldas", "Andradas", "Varginha", "Pouso Alegre"],
-    productLines: ["Imobiliária", "Impermeabilizantes"],
   },
   {
-    id: "rep-mg-capital",
     name: "Mariana Costa",
     company: "Distribuidora MG Representações",
     email: "comercial@distribuidoramg.com.br",
     phone: "(31) 3333-5566",
-    whatsapp: "553133335566",
-    state: "MG",
-    city: "Belo Horizonte",
-    address: "Rua das Acácias, 80 - Belo Horizonte/MG - CEP 30130-100",
     serviceCities: ["Belo Horizonte", "Contagem", "Betim", "Nova Lima"],
-    productLines: ["Imobiliária", "Industrial"],
   },
   {
-    id: "rep-sp-mococa",
     name: "Paulo Henrique Martins",
     company: "PHM Representações",
     email: "paulo.martins@tintasmaza.com.br",
     phone: "(19) 3656-2210",
-    whatsapp: "551936562210",
-    state: "SP",
-    city: "Mococa",
-    address: "Av. João Batista de Lima Figueiredo, 780 - Mococa/SP - CEP 13730-000",
     serviceCities: ["Mococa", "Casa Branca", "São José do Rio Pardo", "Cajuru"],
-    productLines: ["Imobiliária", "Automotivo"],
   },
   {
-    id: "rep-sp-ribeirao",
     name: "Camila Rocha",
     company: "Rocha Soluções Comerciais",
     email: "ribeirao.representante@tintasmaza.com.br",
     phone: "(16) 3620-9090",
-    whatsapp: "551636209090",
-    state: "SP",
-    city: "Ribeirão Preto",
-    address: "Av. Presidente Vargas, 1472 - Ribeirão Preto/SP - CEP 14020-260",
     serviceCities: ["Ribeirão Preto", "Sertãozinho", "Jaboticabal", "Bebedouro"],
-    productLines: ["Imobiliária", "Industrial", "Solventes"],
   },
   {
-    id: "rep-sp-sao-paulo",
     name: "Eduardo Nunes",
     company: "Nunes Trade Representações",
     email: "sp.representante@tintasmaza.com.br",
     phone: "(11) 3208-7711",
-    whatsapp: "551132087711",
-    state: "SP",
-    city: "São Paulo",
-    address: "Rua Vergueiro, 2045 - São Paulo/SP - CEP 04101-000",
     serviceCities: ["São Paulo", "Guarulhos", "Osasco", "ABC Paulista"],
-    productLines: ["Imobiliária", "Automotivo", "Industrial"],
   },
   {
-    id: "rep-pr-curitiba",
     name: "Luiza Almeida",
     company: "Almeida Comercial",
     email: "curitiba.representante@tintasmaza.com.br",
     phone: "(41) 3015-8844",
-    whatsapp: "554130158844",
-    state: "PR",
-    city: "Curitiba",
-    address: "Rua XV de Novembro, 621 - Curitiba/PR - CEP 80020-310",
     serviceCities: ["Curitiba", "São José dos Pinhais", "Colombo", "Pinhais"],
-    productLines: ["Imobiliária", "Impermeabilizantes"],
   },
   {
-    id: "rep-rj-capital",
     name: "Fernanda Lopes",
     company: "Lopes Representações RJ",
     email: "rio.representante@tintasmaza.com.br",
     phone: "(21) 2509-7755",
-    whatsapp: "552125097755",
-    state: "RJ",
-    city: "Rio de Janeiro",
-    address: "Rua da Assembleia, 77 - Rio de Janeiro/RJ - CEP 20011-001",
     serviceCities: ["Rio de Janeiro", "Niterói", "Duque de Caxias", "Nova Iguaçu"],
-    productLines: ["Imobiliária", "Industrial"],
   },
 ];
+
+export const MOCK_REPRESENTATIVE_REGIONS: RepresentativeRegion[] = [
+  { state: "MG", cities: ["Andradas", "Belo Horizonte", "Betim", "Contagem", "Nova Lima", "Poços de Caldas", "Pouso Alegre", "Varginha"] },
+  { state: "PR", cities: ["Colombo", "Curitiba", "Pinhais", "São José dos Pinhais"] },
+  { state: "RJ", cities: ["Duque de Caxias", "Niterói", "Nova Iguaçu", "Rio de Janeiro"] },
+  { state: "SP", cities: ["ABC Paulista", "Bebedouro", "Cajuru", "Casa Branca", "Guarulhos", "Jaboticabal", "Mococa", "Osasco", "Ribeirão Preto", "São José do Rio Pardo", "São Paulo", "Sertãozinho"] },
+];
+
+type ApiCollectionResponse<T> = T[] | { data: T[] };
+
+function readApiCollection<T>(payload: ApiCollectionResponse<T>) {
+  return Array.isArray(payload) ? payload : payload.data;
+}
+
+async function fetchApiCollection<T>(url: string, signal?: AbortSignal) {
+  const response = await fetch(url, { signal });
+
+  if (!response.ok) {
+    throw new Error(`Request failed with status ${response.status}`);
+  }
+
+  const payload = (await response.json()) as ApiCollectionResponse<T>;
+  return readApiCollection(payload);
+}
+
+export async function fetchRepresentativeStates(signal?: AbortSignal) {
+  return fetchApiCollection<string>("/api/representantes/estados", signal);
+}
+
+export async function fetchRepresentativeCitiesByState(state: string, signal?: AbortSignal) {
+  const query = state ? `?state=${encodeURIComponent(state)}` : "";
+
+  return fetchApiCollection<string>(`/api/representantes/cidades${query}`, signal);
+}
+
+export async function fetchRepresentativesByLocation(state: string, city: string, signal?: AbortSignal) {
+  const params = new URLSearchParams();
+
+  if (state) {
+    params.set("state", state);
+  }
+
+  if (city) {
+    params.set("city", city);
+  }
+
+  const query = params.toString() ? `?${params.toString()}` : "";
+
+  return fetchApiCollection<RepresentativeLocation>(`/api/representantes${query}`, signal);
+}
 
 export const BRAZIL_CENTER: GeoPoint = { lat: -15.7801, lng: -47.9292 };
 
@@ -311,25 +278,27 @@ export function formatDistance(distanceKm?: number) {
 }
 
 export function getRepresentativeStates() {
-  return Array.from(new Set(MOCK_REPRESENTATIVES.map((representative) => representative.state))).sort();
+  return MOCK_REPRESENTATIVE_REGIONS.map((region) => region.state).sort();
 }
 
 export function getRepresentativeCities(state: string) {
-  return Array.from(
-    new Set(
-      MOCK_REPRESENTATIVES.filter((representative) => representative.state === state).flatMap((representative) => [
-        representative.city,
-        ...representative.serviceCities,
-      ]),
-    ),
-  ).sort((left, right) => left.localeCompare(right, "pt-BR"));
+  const region = MOCK_REPRESENTATIVE_REGIONS.find((item) => item.state === state);
+
+  return [...(region?.cities ?? [])].sort((left, right) => left.localeCompare(right, "pt-BR"));
 }
 
 export function getRepresentativesByLocation(state: string, city: string) {
-  return MOCK_REPRESENTATIVES.filter((representative) => {
-    const matchesState = !state || representative.state === state;
-    const matchesCity = !city || representative.city === city || representative.serviceCities.includes(city);
+  const stateCities = new Set(getRepresentativeCities(state));
 
-    return matchesState && matchesCity;
+  return MOCK_REPRESENTATIVES.filter((representative) => {
+    if (city) {
+      return representative.serviceCities.includes(city);
+    }
+
+    if (state) {
+      return representative.serviceCities.some((serviceCity) => stateCities.has(serviceCity));
+    }
+
+    return true;
   });
 }

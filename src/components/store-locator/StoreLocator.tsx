@@ -1,13 +1,12 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import type { ReactNode } from "react";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { motion, type Variants } from "framer-motion";
 import {
   ArrowUpRight,
+  Check,
   ChevronDown,
-  Clock,
   Loader2,
   Mail,
   MapPin,
@@ -23,6 +22,9 @@ import { geocodeCepWithNominatim, type GeocodedCep } from "@/lib/nominatim";
 import {
 
   MOCK_STORES,
+  fetchRepresentativeCitiesByState,
+  fetchRepresentativeStates,
+  fetchRepresentativesByLocation,
   formatCep,
   formatDistance,
   getRepresentativeCities,
@@ -86,22 +88,125 @@ function MapLoadingState() {
 
 
 
-function SelectShell({
-  children,
+function DropdownSelect({
   disabled,
+  label,
+  onChange,
+  options,
+  placeholder,
+  value,
 }: Readonly<{
-  children: ReactNode;
   disabled?: boolean;
+  label: string;
+  onChange: (value: string) => void;
+  options: string[];
+  placeholder: string;
+  value: string;
 }>) {
+  const [isOpen, setIsOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const selectedLabel = value || placeholder;
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    function handlePointerDown(event: MouseEvent | TouchEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
+
+  function selectOption(nextValue: string) {
+    onChange(nextValue);
+    setIsOpen(false);
+  }
+
   return (
-    <div
-      className={`relative flex h-14 items-center rounded-[8px] border bg-[#FCFCF7] px-4 transition-colors focus-within:border-[#B11116] ${
-        disabled ? "border-[#ECECE4] opacity-60" : "border-[#DEDED6]"
-      }`}
-    >
-      {children}
-      <ChevronDown className="pointer-events-none absolute right-4 h-4 w-4 text-[#5F5F5A]" aria-hidden />
-    </div>
+    <label className="flex flex-col gap-2">
+      <span className="text-sm font-bold text-[#1C1C1C]">{label}</span>
+      <div ref={rootRef} className="relative">
+        <button
+          aria-expanded={isOpen}
+          aria-haspopup="listbox"
+          className={`flex h-14 w-full items-center justify-between gap-3 rounded-[8px] border px-4 text-left transition-all ${
+            disabled
+              ? "cursor-not-allowed border-[#ECECE4] bg-[#F1F1EA] text-[#8C8C84] opacity-70"
+              : isOpen
+                ? "border-[#B11116] bg-white shadow-[0_16px_42px_-30px_rgba(177,17,22,0.75)]"
+                : "border-[#DEDED6] bg-[#FCFCF7] text-[#1C1C1C] hover:border-[#B11116]/45"
+          }`}
+          disabled={disabled}
+          onClick={() => setIsOpen((current) => !current)}
+          type="button"
+        >
+          <span className={`min-w-0 flex-1 truncate text-base font-bold ${value ? "text-[#1C1C1C]" : "text-[#8C8C84]"}`}>
+            {selectedLabel}
+          </span>
+          <ChevronDown
+            className={`h-4 w-4 shrink-0 text-[#B11116] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+            aria-hidden
+          />
+        </button>
+
+        {isOpen && !disabled ? (
+          <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-40 overflow-hidden rounded-[8px] border border-[#E7E7DE] bg-white shadow-[0_26px_70px_-42px_rgba(28,28,28,0.75)]">
+            <div className="max-h-64 overflow-auto p-1.5" role="listbox">
+              <button
+                aria-selected={!value}
+                className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-[6px] px-3 text-left text-sm font-bold transition-colors ${
+                  !value ? "bg-[#B11116]/10 text-[#B11116]" : "text-[#5F5F5A] hover:bg-[#F7F7F0] hover:text-[#1C1C1C]"
+                }`}
+                onClick={() => selectOption("")}
+                role="option"
+                type="button"
+              >
+                <span className="truncate">{placeholder}</span>
+                {!value ? <Check className="h-4 w-4 shrink-0" aria-hidden /> : null}
+              </button>
+
+              {options.map((option) => {
+                const isSelected = option === value;
+
+                return (
+                  <button
+                    aria-selected={isSelected}
+                    className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-[6px] px-3 text-left text-sm font-bold transition-colors ${
+                      isSelected ? "bg-[#B11116]/10 text-[#B11116]" : "text-[#5F5F5A] hover:bg-[#F7F7F0] hover:text-[#1C1C1C]"
+                    }`}
+                    key={option}
+                    onClick={() => selectOption(option)}
+                    role="option"
+                    type="button"
+                  >
+                    <span className="truncate">{option}</span>
+                    {isSelected ? <Check className="h-4 w-4 shrink-0" aria-hidden /> : null}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </label>
   );
 }
 
@@ -150,17 +255,9 @@ function StoreCard({
       </button>
 
       <div className="mt-4 grid gap-2 border-t border-[#F1F1EA] pt-4 text-sm text-[#5F5F5A]">
-        <span className="flex items-center gap-2">
-          <Clock className="h-4 w-4 text-[#B11116]" aria-hidden />
-          {store.hours}
-        </span>
         <a className="flex items-center gap-2 transition-colors hover:text-[#B11116]" href={`tel:${store.phone.replace(/\D/g, "")}`}>
           <Phone className="h-4 w-4 text-[#B11116]" aria-hidden />
           {store.phone}
-        </a>
-        <a className="flex items-center gap-2 break-all transition-colors hover:text-[#B11116]" href={`mailto:${store.email}`}>
-          <Mail className="h-4 w-4 shrink-0 text-[#B11116]" aria-hidden />
-          {store.email}
         </a>
       </div>
 
@@ -176,7 +273,7 @@ function StoreCard({
         </a>
         <a
           className="inline-flex items-center gap-2 rounded-full border border-[#E7E7DE] px-4 py-2 text-xs font-black uppercase tracking-[0.08em] text-[#1C1C1C] transition-colors hover:border-[#B11116]/40 hover:text-[#B11116]"
-          href={`https://wa.me/${store.whatsapp}`}
+          href={`https://wa.me/${store.phone.replace(/\D/g, "")}`}
           rel="noreferrer"
           target="_blank"
         >
@@ -204,10 +301,6 @@ function RepresentativeCard({ representative }: Readonly<{ representative: Repre
       </div>
 
       <div className="mt-4 grid gap-2 border-t border-[#F1F1EA] pt-4 text-sm text-[#5F5F5A]">
-        <span className="flex items-start gap-2">
-          <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#B11116]" aria-hidden />
-          {representative.address}
-        </span>
         <a
           className="flex items-center gap-2 transition-colors hover:text-[#B11116]"
           href={`tel:${representative.phone.replace(/\D/g, "")}`}
@@ -220,26 +313,6 @@ function RepresentativeCard({ representative }: Readonly<{ representative: Repre
           {representative.email}
         </a>
       </div>
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        {representative.productLines.map((line) => (
-          <span className="rounded-full bg-[#F1F1EA] px-3 py-1.5 text-xs font-bold text-[#5F5F5A]" key={line}>
-            {line}
-          </span>
-        ))}
-      </div>
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        <a
-          className="inline-flex items-center gap-2 rounded-full bg-[#1C1C1C] px-4 py-2 text-xs font-black uppercase tracking-[0.08em] text-white transition-colors hover:bg-[#B11116]"
-          href={`https://wa.me/${representative.whatsapp}`}
-          rel="noreferrer"
-          target="_blank"
-        >
-          WhatsApp
-          <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
-        </a>
-      </div>
     </article>
   );
 }
@@ -249,8 +322,12 @@ export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorPr
   const [cep, setCep] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const [representativeCity, setRepresentativeCity] = useState("");
   const [representativeState, setRepresentativeState] = useState("");
+  const [representativeCity, setRepresentativeCity] = useState("");
+  const [representativeStates, setRepresentativeStates] = useState<string[]>(() => getRepresentativeStates());
+  const [representativeCities, setRepresentativeCities] = useState<string[]>([]);
+  const [representatives, setRepresentatives] = useState<RepresentativeLocation[]>([]);
+  const [representativeStatus, setRepresentativeStatus] = useState<SearchStatus>("idle");
 
   const [selectedStoreId, setSelectedStoreId] = useState(MOCK_STORES[0]?.id);
   const [status, setStatus] = useState<SearchStatus>("idle");
@@ -259,6 +336,9 @@ export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorPr
   const [isDetectingIpLocation, setIsDetectingIpLocation] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const ipLocationAbortRef = useRef<AbortController | null>(null);
+  const representativeStatesAbortRef = useRef<AbortController | null>(null);
+  const representativeCitiesAbortRef = useRef<AbortController | null>(null);
+  const representativeAbortRef = useRef<AbortController | null>(null);
   const hasManualLocationSearchRef = useRef(false);
   const cacheRef = useRef(new Map<string, GeocodedCep>());
 
@@ -267,6 +347,107 @@ export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorPr
   }, [initialMode]);
 
   useEffect(() => () => abortRef.current?.abort(), []);
+  useEffect(
+    () => () => {
+      representativeStatesAbortRef.current?.abort();
+      representativeCitiesAbortRef.current?.abort();
+      representativeAbortRef.current?.abort();
+    },
+    [],
+  );
+
+  useEffect(() => {
+    const controller = new AbortController();
+    representativeStatesAbortRef.current = controller;
+
+    void fetchRepresentativeStates(controller.signal)
+      .then((states) => {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setRepresentativeStates(states);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setRepresentativeStates(getRepresentativeStates());
+        }
+      })
+      .finally(() => {
+        if (representativeStatesAbortRef.current === controller) {
+          representativeStatesAbortRef.current = null;
+        }
+      });
+  }, []);
+
+  useEffect(() => {
+    representativeCitiesAbortRef.current?.abort();
+    setRepresentativeCity("");
+
+    if (!representativeState) {
+      setRepresentativeCities([]);
+      return;
+    }
+
+    const controller = new AbortController();
+    representativeCitiesAbortRef.current = controller;
+
+    void fetchRepresentativeCitiesByState(representativeState, controller.signal)
+      .then((cities) => {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setRepresentativeCities(cities);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setRepresentativeCities(getRepresentativeCities(representativeState));
+        }
+      })
+      .finally(() => {
+        if (representativeCitiesAbortRef.current === controller) {
+          representativeCitiesAbortRef.current = null;
+        }
+      });
+  }, [representativeState]);
+
+  useEffect(() => {
+    representativeAbortRef.current?.abort();
+
+    if (!representativeCity) {
+      setRepresentatives([]);
+      setRepresentativeStatus("idle");
+      return;
+    }
+
+    const controller = new AbortController();
+    representativeAbortRef.current = controller;
+    setRepresentativeStatus("loading");
+
+    void fetchRepresentativesByLocation(representativeState, representativeCity, controller.signal)
+      .then((nextRepresentatives) => {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setRepresentatives(nextRepresentatives);
+        setRepresentativeStatus("success");
+      })
+      .catch(() => {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setRepresentatives(getRepresentativesByLocation(representativeState, representativeCity));
+        setRepresentativeStatus("success");
+      })
+      .finally(() => {
+        if (representativeAbortRef.current === controller) {
+          representativeAbortRef.current = null;
+        }
+      });
+  }, [representativeCity, representativeState]);
 
   useEffect(() => {
     let isActive = true;
@@ -321,12 +502,6 @@ export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorPr
     return rankedStores.slice(0, 6);
   }, [rankedStores, userLocation]);
 
-  const representativeStates = useMemo(() => getRepresentativeStates(), []);
-  const representativeCities = useMemo(() => getRepresentativeCities(representativeState), [representativeState]);
-  const representatives = useMemo(
-    () => getRepresentativesByLocation(representativeState, representativeCity),
-    [representativeCity, representativeState],
-  );
   const selectedStore = visibleStores.find((store) => store.id === selectedStoreId) ?? visibleStores[0];
   const storeSearchHint = useMemo(() => {
     if (status === "loading") {
@@ -445,7 +620,7 @@ export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorPr
             <p className="text-sm font-semibold text-[#5F5F5A]">
               {activeMode === "stores"
                 ? storeSearchHint
-                : "Selecione estado e cidade para encontrar o representante."}
+                : "Selecione estado e cidade para encontrar representantes que atendem a região."}
             </p>
           </div>
 
@@ -486,54 +661,36 @@ export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorPr
             </form>
           ) : (
             <div className="grid gap-5 md:grid-cols-[1fr_1fr_auto] md:items-end">
-              <label className="flex flex-col gap-2">
-                <span className="text-sm font-bold text-[#1C1C1C]">Estado</span>
-                <SelectShell>
-                  <select
-                    aria-label="Selecione o estado"
-                    className="h-full w-full appearance-none bg-transparent pr-8 text-base font-bold text-[#1C1C1C] outline-none"
-                    onChange={(event) => {
-                      setRepresentativeState(event.target.value);
-                      setRepresentativeCity("");
-                    }}
-                    value={representativeState}
-                  >
-                    <option value="">Selecione o estado</option>
-                    {representativeStates.map((state) => (
-                      <option key={state} value={state}>
-                        {state}
-                      </option>
-                    ))}
-                  </select>
-                </SelectShell>
-              </label>
+              <DropdownSelect
+                label="Estado"
+                onChange={(state) => {
+                  setRepresentativeState(state);
+                  setRepresentativeCity("");
+                }}
+                options={representativeStates}
+                placeholder="Selecione o estado"
+                value={representativeState}
+              />
 
-              <label className="flex flex-col gap-2">
-                <span className="text-sm font-bold text-[#1C1C1C]">Cidade</span>
-                <SelectShell disabled={!representativeState}>
-                  <select
-                    aria-label="Selecione a cidade"
-                    className="h-full w-full appearance-none bg-transparent pr-8 text-base font-bold text-[#1C1C1C] outline-none disabled:cursor-not-allowed"
-                    disabled={!representativeState}
-                    onChange={(event) => setRepresentativeCity(event.target.value)}
-                    value={representativeCity}
-                  >
-                    <option value="">Todas as cidades</option>
-                    {representativeCities.map((city) => (
-                      <option key={city} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                  </select>
-                </SelectShell>
-              </label>
+              <DropdownSelect
+                disabled={!representativeState}
+                label="Cidade"
+                onChange={setRepresentativeCity}
+                options={representativeCities}
+                placeholder="Todas as cidades"
+                value={representativeCity}
+              />
 
               <button
                 className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-[#B11116] px-7 text-sm font-black uppercase tracking-[0.08em] text-white shadow-[0_20px_45px_-22px_rgba(177,17,22,0.9)] transition-all hover:-translate-y-0.5 hover:bg-[#A00010] disabled:cursor-not-allowed disabled:opacity-65 disabled:hover:translate-y-0"
-                disabled={!representativeState}
+                disabled={!representativeState || representativeStatus === "loading"}
                 type="button"
               >
-                <Search className="h-4 w-4" aria-hidden />
+                {representativeStatus === "loading" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                ) : (
+                  <Search className="h-4 w-4" aria-hidden />
+                )}
                 Filtrar
               </button>
             </div>
@@ -579,9 +736,13 @@ export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorPr
         ) : (
           <motion.div className="grid gap-6" variants={itemVariants}>
             <div className="grid gap-4 md:grid-cols-2">
-              {representatives.length > 0 ? (
+              {!representativeCity ? (
+                <div className="rounded-[8px] border border-[#E7E7DE] bg-white p-6 text-sm font-semibold text-[#5F5F5A] md:col-span-2">
+                  Selecione uma cidade para ver os representantes disponíveis.
+                </div>
+              ) : representatives.length > 0 ? (
                 representatives.map((representative) => (
-                  <RepresentativeCard key={representative.id} representative={representative} />
+                  <RepresentativeCard key={`${representative.email}-${representative.name}`} representative={representative} />
                 ))
               ) : (
                 <div className="rounded-[8px] border border-[#E7E7DE] bg-white p-6 text-sm font-semibold text-[#5F5F5A] md:col-span-2">

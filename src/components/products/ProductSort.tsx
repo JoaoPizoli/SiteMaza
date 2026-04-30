@@ -28,33 +28,33 @@ export function ProductSort({ onSortChange }: ProductSortProps) {
 
   return (
     <div className="flex items-center gap-4 relative z-20">
-      <span className="text-sm font-medium text-[#64748B]">
+      <span className="text-sm font-medium text-[#5F5F5A]">
         Ordenar por:
       </span>
-      
+
       <div className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E2E8F0] rounded-lg hover:border-[#FBB943] transition-colors min-w-[180px] justify-between"
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-[#DEDED6] rounded-lg hover:border-[#FBB943] transition-colors min-w-[180px] justify-between"
         >
           <span className="text-sm font-medium text-[#1C1C1C]">{selected}</span>
-          <ChevronDown 
+          <ChevronDown
             className={cn(
-              "w-4 h-4 text-[#94A3B8] transition-transform duration-200",
+              "w-4 h-4 text-[#8C8C84] transition-transform duration-200",
               isOpen && "rotate-180"
-            )} 
+            )}
           />
         </button>
 
         {isOpen && (
-          <div className="absolute top-full right-0 mt-2 w-full bg-white border border-[#E2E8F0] rounded-lg shadow-lg overflow-hidden py-1">
+          <div className="absolute top-full right-0 mt-2 w-full bg-white border border-[#DEDED6] rounded-lg shadow-lg overflow-hidden py-1">
             {options.map((option) => (
               <button
                 key={option}
                 onClick={() => handleSelect(option)}
                 className={cn(
-                  "w-full px-4 py-2 text-left text-sm hover:bg-[#F8FAFC] transition-colors",
-                  selected === option ? "text-[#FBB943] font-medium" : "text-[#1C1C1C]"
+                  "w-full px-4 py-2 text-left text-sm hover:bg-[#FCFCF7] transition-colors",
+                  selected === option ? "text-[#B11116] font-medium" : "text-[#1C1C1C]"
                 )}
               >
                 {option}

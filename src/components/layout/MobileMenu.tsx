@@ -130,7 +130,7 @@ export function MobileMenu({ onClose }: MobileMenuProps) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={onClose}
-              className="inline-flex items-center justify-center gap-2 h-12 rounded-full bg-[#FBB943] text-[#1C1C1C] hover:bg-[#ffca68] transition-colors text-[14px] font-semibold shadow-[0_10px_30px_-10px_rgba(251,185,67,0.7)]"
+              className="inline-flex items-center justify-center gap-2 h-12 rounded-full bg-[#FBB943] text-[#1C1C1C] hover:bg-[#FFD996] transition-colors text-[14px] font-semibold shadow-[0_10px_30px_-10px_rgba(251,185,67,0.7)]"
             >
               <User className="w-4 h-4" aria-hidden />
               <span>Área do cliente</span>

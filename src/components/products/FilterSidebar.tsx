@@ -116,13 +116,13 @@ export function FilterSidebar({
     <aside className={cn("flex flex-col gap-8 w-full max-w-[300px]", className)}>
       {/* Search Form */}
       <form onSubmit={handleSearch} className="relative w-full">
-        <div className="relative flex items-center w-full h-12 rounded-full border border-[#E2E8F0] bg-white overflow-hidden focus-within:ring-2 focus-within:ring-[#B11116] transition-all">
+        <div className="relative flex items-center w-full h-12 rounded-full border border-[#DEDED6] bg-white overflow-hidden focus-within:ring-2 focus-within:ring-[#B11116] transition-all">
           <input
             type="text"
             placeholder="Digite o nome do produto"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-full pl-6 pr-12 text-sm text-[#1C1C1C] placeholder:text-[#94A3B8] outline-none bg-transparent"
+            className="w-full h-full pl-6 pr-12 text-sm text-[#1C1C1C] placeholder:text-[#8C8C84] outline-none bg-transparent"
           />
           <button
             type="submit"
@@ -135,20 +135,20 @@ export function FilterSidebar({
 
       {/* Active Filter Display */}
       {activeFilter && (
-        <div className="flex items-center gap-2 p-2 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0]">
-          <span className="text-xs font-medium text-[#64748B]">
+        <div className="flex items-center gap-2 p-2 bg-[#F1F1EA] rounded-lg border border-[#DEDED6]">
+          <span className="text-xs font-medium text-[#5F5F5A]">
             Filtrando por: <span className="text-[#1C1C1C]">{activeFilter.subcategory || activeFilter.category}</span>
           </span>
-          <button onClick={clearFilter} className="ml-auto text-[#94A3B8] hover:text-[#EF4444]">
+          <button onClick={clearFilter} className="ml-auto text-[#8C8C84] hover:text-[#B11116]">
             <X className="w-3 h-3" />
           </button>
         </div>
       )}
 
       {/* Categories Accordion */}
-      <div className="flex flex-col w-full border-t border-[#E2E8F0]">
+      <div className="flex flex-col w-full border-t border-[#DEDED6]">
         {CATEGORIES.map((category) => (
-          <div key={category.id} className="border-b border-[#E2E8F0]">
+          <div key={category.id} className="border-b border-[#DEDED6]">
             <button
               onClick={() => toggleSection(category.id)}
               className="flex items-center justify-between w-full py-4 text-left group"
@@ -161,7 +161,7 @@ export function FilterSidebar({
               </span>
               <ChevronDown 
                 className={cn(
-                  "w-5 h-5 text-[#94A3B8] transition-transform duration-300",
+                  "w-5 h-5 text-[#8C8C84] transition-transform duration-300",
                   openSection === category.id ? "rotate-180 text-[#B11116]" : ""
                 )} 
               />
@@ -185,12 +185,12 @@ export function FilterSidebar({
                           "flex items-center gap-2 text-sm transition-colors text-left",
                           activeFilter?.subcategory === sub 
                             ? "text-[#B11116] font-medium" 
-                            : "text-[#64748B] hover:text-[#1C1C1C]"
+                            : "text-[#5F5F5A] hover:text-[#1C1C1C]"
                         )}
                       >
                         <div className={cn(
                           "w-1.5 h-1.5 rounded-full transition-colors",
-                          activeFilter?.subcategory === sub ? "bg-[#B11116]" : "bg-[#E2E8F0]"
+                          activeFilter?.subcategory === sub ? "bg-[#B11116]" : "bg-[#DEDED6]"
                         )} />
                         {sub}
                       </button>

@@ -243,8 +243,8 @@ export function Navbar() {
               className={cn(
                 "inline-flex items-center gap-2 h-10 px-4 rounded-full text-[14px] font-semibold transition-all shadow-sm",
                 solid
-                  ? "bg-[#FBB943] text-[#1C1C1C] hover:bg-[#ffca68]"
-                  : "bg-[#FBB943] text-[#1C1C1C] hover:bg-[#ffca68]"
+                  ? "bg-[#FBB943] text-[#1C1C1C] hover:bg-[#FFD996]"
+                  : "bg-[#FBB943] text-[#1C1C1C] hover:bg-[#FFD996]"
               )}
             >
               <User className="w-4 h-4" aria-hidden />

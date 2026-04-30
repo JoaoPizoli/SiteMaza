@@ -43,7 +43,7 @@ export function ResultsSection() {
   const getCardAt = (offset: number) => VIDEOS[(active + offset + total) % total];
 
   return (
-    <section className="relative w-full py-24 lg:py-32 px-6 xl:px-10 overflow-hidden bg-gradient-to-b from-white to-[#F8FAFC]">
+    <section className="relative w-full py-24 lg:py-32 px-6 xl:px-10 overflow-hidden bg-gradient-to-b from-white to-[#FCFCF7]">
       <motion.div
         className="w-full max-w-[1440px] mx-auto flex flex-col items-center gap-12"
         initial="hidden"

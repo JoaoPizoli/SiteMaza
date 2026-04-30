@@ -102,13 +102,13 @@ export function ProductsSection() {
         className="w-full max-w-[1440px] mx-auto mt-20 lg:mt-28"
       >
         <div className="flex items-center gap-6 mb-10">
-          <div className="h-px flex-1 bg-[#E2E8F0]" />
+          <div className="h-px flex-1 bg-[#DEDED6]" />
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(251,185,67,0.15)] border border-[rgba(251,185,67,0.35)]">
             <span className="font-black text-[12px] tracking-[0.14em] text-[#B11116]">
               CERTIFICADOS
             </span>
           </div>
-          <div className="h-px flex-1 bg-[#E2E8F0]" />
+          <div className="h-px flex-1 bg-[#DEDED6]" />
         </div>
 
         <div className="flex justify-center items-center gap-10 lg:gap-16 flex-wrap grayscale opacity-70 hover:opacity-100 hover:grayscale-0 transition-all duration-500">
