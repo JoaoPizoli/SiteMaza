@@ -22,6 +22,8 @@ export function ProductCard({ image, category, description, href }: ProductCardP
           alt={category}
           fill
           sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw"
+          quality={70}
+          loading="lazy"
           className="object-cover"
         />
       </div>

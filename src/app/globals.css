@@ -130,8 +130,10 @@
 }
 
 @keyframes maza-shine {
-  0%   { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  /* 0%–66.66% (1s): pausa — brilho fora do texto, só o dourado aparece */
+  0%, 66.66%  { background-position: -350% 0, 0 0; }
+  /* 66.66%–100% (~0.5s): brilho atravessa o texto */
+  100%        { background-position: 450% 0, 0 0; }
 }
 
 @keyframes maza-fade-in {
@@ -139,14 +141,27 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes maza-nav-enter {
+  from { opacity: 0; transform: translate3d(0, -100px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
 .animate-maza-mesh  { animation: maza-mesh-shift 18s ease-in-out infinite; }
 .animate-maza-float { animation: maza-float 6s ease-in-out infinite; }
 .animate-maza-shine {
-  background-image: linear-gradient(100deg, transparent 20%, rgba(255,255,255,.35) 50%, transparent 80%);
-  background-size: 200% 100%;
-  animation: maza-shine 3.5s linear infinite;
+  /* Duas camadas: brilho (animado) sobre o gradiente dourado fixo.
+   * Durante a pausa, o brilho fica fora do texto e só o dourado aparece. */
+  background-image:
+    linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.55) 50%, transparent 100%),
+    linear-gradient(to right, #FBB943, #FFD996, #FBB943);
+  background-size: 75% 100%, 100% 100%;
+  background-repeat: no-repeat, no-repeat;
+  background-position: -350% 0, 0 0;
+  /* Ciclo total 1.5s: pausa 1s → brilho atravessa em ~0.5s → loop */
+  animation: maza-shine 1.5s linear infinite;
 }
 .animate-maza-in    { animation: maza-fade-in .6s ease-out both; }
+.animate-maza-nav-enter { animation: maza-nav-enter .5s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
 /* Grid sutil de pontos (usado no Hero) */
 .bg-maza-grid {
@@ -261,5 +276,22 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ── Performance ──────────────────────────────────────────────────────
+ * content-visibility libera renderização e layout das seções fora da
+ * viewport. contain-intrinsic-size reserva espaço aproximado para
+ * evitar saltos de scroll quando a seção entra no viewport. */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 800px;
+}
+
+/* Promove os layers animados a uma camada GPU estável (Hero) */
+[data-gsap-paint-brush],
+.animate-maza-mesh {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 

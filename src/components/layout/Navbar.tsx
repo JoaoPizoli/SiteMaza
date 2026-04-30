@@ -45,10 +45,36 @@ export function Navbar() {
   const solid = isScrolled || isLightPage;
 
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 24);
-    onScroll();
+    let frame = 0;
+    let lastValue = false;
+
+    const update = () => {
+      const next = window.scrollY > 24;
+      if (next !== lastValue) {
+        lastValue = next;
+        setIsScrolled(next);
+      }
+    };
+
+    const onScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        update();
+      });
+    };
+
+    // Sincroniza o estado inicial caso a página já carregue com scroll
+    if (window.scrollY > 24) {
+      lastValue = true;
+      setIsScrolled(true);
+    }
+
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
   }, []);
 
   const logoSrc = solid
@@ -68,12 +94,9 @@ export function Navbar() {
 
   return (
     <>
-      <motion.header
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+          "animate-maza-nav-enter fixed top-0 left-0 right-0 z-50 transition-all duration-300",
           solid
             ? "bg-white/85 backdrop-blur-xl shadow-[0_1px_0_0_rgba(0,0,0,0.06),0_10px_30px_-15px_rgba(0,0,0,0.18)]"
             : "bg-transparent"
@@ -96,6 +119,8 @@ export function Navbar() {
               width={120}
               height={68}
               priority
+              fetchPriority="high"
+              sizes="120px"
               className="object-contain h-10 lg:h-12 w-auto transition-transform duration-300 group-hover:scale-[1.03]"
             />
           </Link>
@@ -253,7 +278,7 @@ export function Navbar() {
             solid ? "opacity-100 bg-black/5" : "opacity-0"
           )}
         />
-      </motion.header>
+      </header>
 
       <AnimatePresence>
         {isMenuOpen && <MobileMenu onClose={() => setIsMenuOpen(false)} />}

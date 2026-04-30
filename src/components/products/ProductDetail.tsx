@@ -68,8 +68,10 @@ export function ProductDetail({ product, relatedProducts }: ProductDetailProps) 
                   alt={product.title}
                   fill
                   sizes="(min-width: 1024px) 50vw, 100vw"
+                  quality={75}
                   className="object-contain p-8"
                   priority
+                  fetchPriority="high"
                 />
                 <div
                   aria-hidden

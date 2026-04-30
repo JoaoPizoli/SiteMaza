@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Roboto } from "next/font/google";
-import "leaflet/dist/leaflet.css";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -8,9 +7,10 @@ import { Footer } from "@/components/layout/Footer";
 const roboto = Roboto({
   variable: "--font-roboto",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "700", "900"],
+  weight: ["400", "500", "700", "900"],
   display: "swap",
   preload: true,
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
@@ -78,6 +78,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={roboto.variable}>
+      <head>
+        <link rel="preconnect" href="https://viacep.com.br" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://nominatim.openstreetmap.org" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
+      </head>
       <body className="antialiased font-roboto">
         <a
           href="#main-content"

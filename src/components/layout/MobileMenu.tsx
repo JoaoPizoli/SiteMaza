@@ -73,6 +73,8 @@ export function MobileMenu({ onClose }: MobileMenuProps) {
               alt="Tintas Maza"
               width={110}
               height={60}
+              sizes="110px"
+              loading="lazy"
               className="h-9 w-auto object-contain"
             />
           </Link>

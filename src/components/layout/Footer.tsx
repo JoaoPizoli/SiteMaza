@@ -69,9 +69,10 @@ export function Footer() {
       >
         <Image
           src="/assets/footer/footer-bg-1.svg"
-          alt="Background Vector 1"
+          alt=""
           width={650}
           height={141}
+          loading="lazy"
         />
       </motion.div>
       <motion.div 
@@ -83,9 +84,10 @@ export function Footer() {
       >
         <Image
           src="/assets/footer/footer-bg-2.svg"
-          alt="Background Vector 2"
+          alt=""
           width={356}
           height={141}
+          loading="lazy"
         />
       </motion.div>
 
@@ -107,6 +109,7 @@ export function Footer() {
                 alt="Maza Logo"
                 width={168}
                 height={95}
+                loading="lazy"
                 className="object-contain"
               />
             </Link>
@@ -127,7 +130,7 @@ export function Footer() {
                 <Link href="/produtos" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
                   Linha de produtos
                 </Link>
-                <Link href="/representantes" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                <Link prefetch={false} href="/representantes" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
                   Representantes
                 </Link>
                 <Link href="/onde-encontrar" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
@@ -136,13 +139,13 @@ export function Footer() {
                 <Link href="https://portal.maza.com.br/" target="_blank" rel="noopener noreferrer" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
                   Área do cliente
                 </Link>
-                <Link href="/trabalhe-conosco" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                <Link prefetch={false} href="/trabalhe-conosco" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
                   Trabalhe conosco
                 </Link>
-                <Link href="/downloads" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                <Link prefetch={false} href="/downloads" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
                   Downloads
                 </Link>
-                <Link href="/mural" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                <Link prefetch={false} href="/mural" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
                   Mural
                 </Link>
               </div>
@@ -154,16 +157,16 @@ export function Footer() {
                 Linhas de produtos
               </h5>
               <div className="flex flex-col gap-2">
-                <Link href="/produtos/imobiliaria" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                <Link prefetch={false} href="/produtos/imobiliaria" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
                   Linha imobiliária
                 </Link>
-                <Link href="/produtos/automotiva" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                <Link prefetch={false} href="/produtos/automotiva" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
                   Linha automotiva
                 </Link>
-                <Link href="/produtos/industrial" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                <Link prefetch={false} href="/produtos/industrial" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
                   Linha industrial
                 </Link>
-                <Link href="/produtos/impermeabilizantes" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
+                <Link prefetch={false} href="/produtos/impermeabilizantes" className="font-roboto font-normal text-[16px] leading-[1.5em] text-[#F1F1EA] hover:text-white transition-colors">
                   Linha Impermeabilizantes
                 </Link>
               </div>
@@ -173,7 +176,7 @@ export function Footer() {
             <motion.div className="flex flex-col gap-4" variants={itemVariants}>
               <div className="flex items-center gap-2 group cursor-pointer">
                 <div className="w-5 h-5 flex items-center justify-center">
-                  <Image src="/assets/footer/instagram.svg" alt="Instagram" width={20} height={20} />
+                  <Image src="/assets/footer/instagram.svg" alt="Instagram" width={20} height={20} loading="lazy" />
                 </div>
                 <span className="font-roboto font-normal text-[16px] leading-[1.5em] text-white group-hover:opacity-80 transition-opacity">
                   Instagram
@@ -181,7 +184,7 @@ export function Footer() {
               </div>
               <div className="flex items-center gap-2 group cursor-pointer">
                 <div className="w-5 h-5 flex items-center justify-center">
-                  <Image src="/assets/footer/facebook.svg" alt="Facebook" width={20} height={20} />
+                  <Image src="/assets/footer/facebook.svg" alt="Facebook" width={20} height={20} loading="lazy" />
                 </div>
                 <span className="font-roboto font-normal text-[16px] leading-[1.5em] text-white group-hover:opacity-80 transition-opacity">
                   Facebook
@@ -189,7 +192,7 @@ export function Footer() {
               </div>
               <div className="flex items-center gap-2 group cursor-pointer">
                 <div className="w-5 h-5 flex items-center justify-center">
-                  <Image src="/assets/footer/linkedin.svg" alt="Linkedin" width={20} height={20} />
+                  <Image src="/assets/footer/linkedin.svg" alt="Linkedin" width={20} height={20} loading="lazy" />
                 </div>
                 <span className="font-roboto font-normal text-[16px] leading-[1.5em] text-white group-hover:opacity-80 transition-opacity">
                   Linkedin
@@ -205,11 +208,12 @@ export function Footer() {
       <div className="w-full bg-[#A00010] relative">
          {/* Decorative Top Border/Vector */}
         <div className="absolute top-0 left-0 w-full h-[4px]">
-             <Image 
-                src="/assets/footer/footer-bottom-bg.svg" 
-                alt="Footer Divider" 
-                width={1920} 
-                height={4} 
+             <Image
+                src="/assets/footer/footer-bottom-bg.svg"
+                alt=""
+                width={1920}
+                height={4}
+                loading="lazy"
                 className="w-full h-full object-cover"
              />
         </div>
