@@ -1,5 +1,4 @@
-import distance from "@turf/distance";
-import { point } from "@turf/helpers";
+export { BRAZIL_UFS } from "./api-config";
 
 export interface GeoPoint {
   lat: number;
@@ -8,11 +7,17 @@ export interface GeoPoint {
 
 export interface StoreLocation {
   id: string;
+  codcli?: string;
   name: string;
   address: string;
+  neighborhood?: string;
   city: string;
   state: string;
-  phone: string;
+  zipCode?: string;
+  email?: string;
+  phone?: string;
+  representativeCode?: string;
+  representativeName?: string;
   coordinates: GeoPoint;
 }
 
@@ -25,12 +30,6 @@ export interface RepresentativeLocation {
   company: string;
   email: string;
   phone: string;
-  serviceCities: string[];
-}
-
-export interface RepresentativeRegion {
-  state: string;
-  cities: string[];
 }
 
 export const MOCK_STORES: StoreLocation[] = [
@@ -117,106 +116,71 @@ export const MOCK_STORES: StoreLocation[] = [
   },
 ];
 
-export const MOCK_REPRESENTATIVES: RepresentativeLocation[] = [
-  {
-    name: "Ricardo S. Farini",
-    company: "Farini Representação Comercial Ltda.",
-    email: "diretoria@amazonfortimp.com.br",
-    phone: "(19) 99159-4165",
-    serviceCities: ["Poços de Caldas", "Andradas", "Varginha", "Pouso Alegre"],
-  },
-  {
-    name: "Mariana Costa",
-    company: "Distribuidora MG Representações",
-    email: "comercial@distribuidoramg.com.br",
-    phone: "(31) 3333-5566",
-    serviceCities: ["Belo Horizonte", "Contagem", "Betim", "Nova Lima"],
-  },
-  {
-    name: "Paulo Henrique Martins",
-    company: "PHM Representações",
-    email: "paulo.martins@tintasmaza.com.br",
-    phone: "(19) 3656-2210",
-    serviceCities: ["Mococa", "Casa Branca", "São José do Rio Pardo", "Cajuru"],
-  },
-  {
-    name: "Camila Rocha",
-    company: "Rocha Soluções Comerciais",
-    email: "ribeirao.representante@tintasmaza.com.br",
-    phone: "(16) 3620-9090",
-    serviceCities: ["Ribeirão Preto", "Sertãozinho", "Jaboticabal", "Bebedouro"],
-  },
-  {
-    name: "Eduardo Nunes",
-    company: "Nunes Trade Representações",
-    email: "sp.representante@tintasmaza.com.br",
-    phone: "(11) 3208-7711",
-    serviceCities: ["São Paulo", "Guarulhos", "Osasco", "ABC Paulista"],
-  },
-  {
-    name: "Luiza Almeida",
-    company: "Almeida Comercial",
-    email: "curitiba.representante@tintasmaza.com.br",
-    phone: "(41) 3015-8844",
-    serviceCities: ["Curitiba", "São José dos Pinhais", "Colombo", "Pinhais"],
-  },
-  {
-    name: "Fernanda Lopes",
-    company: "Lopes Representações RJ",
-    email: "rio.representante@tintasmaza.com.br",
-    phone: "(21) 2509-7755",
-    serviceCities: ["Rio de Janeiro", "Niterói", "Duque de Caxias", "Nova Iguaçu"],
-  },
-];
-
-export const MOCK_REPRESENTATIVE_REGIONS: RepresentativeRegion[] = [
-  { state: "MG", cities: ["Andradas", "Belo Horizonte", "Betim", "Contagem", "Nova Lima", "Poços de Caldas", "Pouso Alegre", "Varginha"] },
-  { state: "PR", cities: ["Colombo", "Curitiba", "Pinhais", "São José dos Pinhais"] },
-  { state: "RJ", cities: ["Duque de Caxias", "Niterói", "Nova Iguaçu", "Rio de Janeiro"] },
-  { state: "SP", cities: ["ABC Paulista", "Bebedouro", "Cajuru", "Casa Branca", "Guarulhos", "Jaboticabal", "Mococa", "Osasco", "Ribeirão Preto", "São José do Rio Pardo", "São Paulo", "Sertãozinho"] },
-];
-
 type ApiCollectionResponse<T> = T[] | { data: T[] };
 
 function readApiCollection<T>(payload: ApiCollectionResponse<T>) {
   return Array.isArray(payload) ? payload : payload.data;
 }
 
-async function fetchApiCollection<T>(url: string, signal?: AbortSignal) {
-  const response = await fetch(url, { signal });
+async function fetchApiCollection<T>(url: string, signal?: AbortSignal): Promise<T[]> {
+  const response = await fetch(url, { signal, headers: { Accept: "application/json" } });
 
   if (!response.ok) {
     throw new Error(`Request failed with status ${response.status}`);
   }
 
   const payload = (await response.json()) as ApiCollectionResponse<T>;
-  return readApiCollection(payload);
+  const collection = readApiCollection(payload);
+
+  return Array.isArray(collection) ? collection : [];
 }
 
-export async function fetchRepresentativeStates(signal?: AbortSignal) {
-  return fetchApiCollection<string>("/api/representantes/estados", signal);
-}
-
-export async function fetchRepresentativeCitiesByState(state: string, signal?: AbortSignal) {
-  const query = state ? `?state=${encodeURIComponent(state)}` : "";
-
-  return fetchApiCollection<string>(`/api/representantes/cidades${query}`, signal);
-}
-
-export async function fetchRepresentativesByLocation(state: string, city: string, signal?: AbortSignal) {
-  const params = new URLSearchParams();
-
-  if (state) {
-    params.set("state", state);
+export async function fetchRepresentativeCitiesByUf(uf: string, signal?: AbortSignal) {
+  const normalizedUf = uf.trim().toUpperCase();
+  if (!normalizedUf) {
+    return [] as string[];
   }
 
-  if (city) {
-    params.set("city", city);
+  return fetchApiCollection<string>(
+    `/api/representantes/cidades?uf=${encodeURIComponent(normalizedUf)}`,
+    signal,
+  );
+}
+
+export async function fetchRepresentativesByCity(city: string, signal?: AbortSignal) {
+  const normalizedCity = city.trim();
+  if (!normalizedCity) {
+    return [] as RepresentativeLocation[];
   }
 
-  const query = params.toString() ? `?${params.toString()}` : "";
+  return fetchApiCollection<RepresentativeLocation>(
+    `/api/representantes?city=${encodeURIComponent(normalizedCity)}`,
+    signal,
+  );
+}
 
-  return fetchApiCollection<RepresentativeLocation>(`/api/representantes${query}`, signal);
+export async function fetchStores(signal?: AbortSignal) {
+  return fetchApiCollection<StoreWithDistance>("/api/lojas?limit=6", signal);
+}
+
+export async function fetchNearbyStores(
+  origin: GeoPoint,
+  options: { signal?: AbortSignal; limit?: number; radiusKm?: number } = {},
+) {
+  const params = new URLSearchParams({
+    lat: String(origin.lat),
+    lng: String(origin.lng),
+    limit: String(options.limit ?? 6),
+  });
+
+  if (options.radiusKm) {
+    params.set("raioKm", String(options.radiusKm));
+  }
+
+  return fetchApiCollection<StoreWithDistance>(
+    `/api/lojas/proximas?${params.toString()}`,
+    options.signal,
+  );
 }
 
 export const BRAZIL_CENTER: GeoPoint = { lat: -15.7801, lng: -47.9292 };
@@ -247,11 +211,21 @@ export function isValidCep(value: string) {
 }
 
 export function calculateDistanceKm(origin: GeoPoint, destination: GeoPoint) {
-  return distance(
-    point([origin.lng, origin.lat]),
-    point([destination.lng, destination.lat]),
-    { units: "kilometers" },
-  );
+  const earthRadiusKm = 6371;
+  const toRadians = (value: number) => (value * Math.PI) / 180;
+  const latDistance = toRadians(destination.lat - origin.lat);
+  const lngDistance = toRadians(destination.lng - origin.lng);
+  const originLat = toRadians(origin.lat);
+  const destinationLat = toRadians(destination.lat);
+  const a =
+    Math.sin(latDistance / 2) * Math.sin(latDistance / 2) +
+    Math.cos(originLat) *
+      Math.cos(destinationLat) *
+      Math.sin(lngDistance / 2) *
+      Math.sin(lngDistance / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return earthRadiusKm * c;
 }
 
 export function getStoresByDistance(origin: GeoPoint, stores = MOCK_STORES): StoreWithDistance[] {
@@ -275,30 +249,4 @@ export function formatDistance(distanceKm?: number) {
   return `${distanceKm.toLocaleString("pt-BR", {
     maximumFractionDigits: distanceKm < 100 ? 1 : 0,
   })} km`;
-}
-
-export function getRepresentativeStates() {
-  return MOCK_REPRESENTATIVE_REGIONS.map((region) => region.state).sort();
-}
-
-export function getRepresentativeCities(state: string) {
-  const region = MOCK_REPRESENTATIVE_REGIONS.find((item) => item.state === state);
-
-  return [...(region?.cities ?? [])].sort((left, right) => left.localeCompare(right, "pt-BR"));
-}
-
-export function getRepresentativesByLocation(state: string, city: string) {
-  const stateCities = new Set(getRepresentativeCities(state));
-
-  return MOCK_REPRESENTATIVES.filter((representative) => {
-    if (city) {
-      return representative.serviceCities.includes(city);
-    }
-
-    if (state) {
-      return representative.serviceCities.some((serviceCity) => stateCities.has(serviceCity));
-    }
-
-    return true;
-  });
 }

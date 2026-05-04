@@ -4,9 +4,17 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:front": "next dev",
+    "dev:back": "npm --prefix back-site run start:dev",
     "build": "next build",
+    "build:front": "next build",
+    "build:back": "npm --prefix back-site run build",
     "start": "next start",
-    "lint": "eslint"
+    "start:front": "next start",
+    "start:back": "npm --prefix back-site run start:prod",
+    "lint": "eslint",
+    "lint:front": "eslint",
+    "lint:back": "npm --prefix back-site run lint"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",

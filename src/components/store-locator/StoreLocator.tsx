@@ -20,17 +20,14 @@ import {
 import { geolocateByIp } from "@/lib/ip-location";
 import { geocodeCepWithNominatim, type GeocodedCep } from "@/lib/nominatim";
 import {
-
+  BRAZIL_UFS,
   MOCK_STORES,
-  fetchRepresentativeCitiesByState,
-  fetchRepresentativeStates,
-  fetchRepresentativesByLocation,
+  fetchNearbyStores,
+  fetchRepresentativeCitiesByUf,
+  fetchRepresentativesByCity,
+  fetchStores,
   formatCep,
   formatDistance,
-  getRepresentativeCities,
-  getRepresentativeStates,
-  getRepresentativesByLocation,
-  getStoresByDistance,
   isValidCep,
   normalizeCep,
   type GeoPoint,
@@ -66,6 +63,7 @@ const itemVariants: Variants = {
 
 export type LocatorMode = "stores" | "representatives";
 type SearchStatus = "idle" | "loading" | "success" | "error";
+const REPRESENTATIVE_STATES = [...BRAZIL_UFS];
 type LocationContext = {
   source: "cep" | "ip";
   label: string;
@@ -94,6 +92,7 @@ function DropdownSelect({
   onChange,
   options,
   placeholder,
+  searchable = false,
   value,
 }: Readonly<{
   disabled?: boolean;
@@ -101,25 +100,41 @@ function DropdownSelect({
   onChange: (value: string) => void;
   options: string[];
   placeholder: string;
+  searchable?: boolean;
   value: string;
 }>) {
   const [isOpen, setIsOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const rootRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
   const selectedLabel = value || placeholder;
+
+  const filteredOptions = searchable && query.trim()
+    ? options.filter((option) =>
+        option.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+          .includes(query.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()),
+      )
+    : options;
 
   useEffect(() => {
     if (!isOpen) {
       return;
     }
 
+    if (searchable) {
+      setTimeout(() => searchRef.current?.focus(), 0);
+    }
+
     function handlePointerDown(event: MouseEvent | TouchEvent) {
       if (!rootRef.current?.contains(event.target as Node)) {
+        setQuery("");
         setIsOpen(false);
       }
     }
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
+        setQuery("");
         setIsOpen(false);
       }
     }
@@ -133,10 +148,11 @@ function DropdownSelect({
       document.removeEventListener("touchstart", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen]);
+  }, [isOpen, searchable]);
 
   function selectOption(nextValue: string) {
     onChange(nextValue);
+    setQuery("");
     setIsOpen(false);
   }
 
@@ -155,7 +171,13 @@ function DropdownSelect({
                 : "border-[#DEDED6] bg-[#FCFCF7] text-[#1C1C1C] hover:border-[#B11116]/45"
           }`}
           disabled={disabled}
-          onClick={() => setIsOpen((current) => !current)}
+          onClick={() => {
+            if (isOpen) {
+              setQuery("");
+            }
+
+            setIsOpen((current) => !current);
+          }}
           type="button"
         >
           <span className={`min-w-0 flex-1 truncate text-base font-bold ${value ? "text-[#1C1C1C]" : "text-[#8C8C84]"}`}>
@@ -169,39 +191,72 @@ function DropdownSelect({
 
         {isOpen && !disabled ? (
           <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-40 overflow-hidden rounded-[8px] border border-[#E7E7DE] bg-white shadow-[0_26px_70px_-42px_rgba(28,28,28,0.75)]">
-            <div className="max-h-64 overflow-auto p-1.5" role="listbox">
-              <button
-                aria-selected={!value}
-                className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-[6px] px-3 text-left text-sm font-bold transition-colors ${
-                  !value ? "bg-[#B11116]/10 text-[#B11116]" : "text-[#5F5F5A] hover:bg-[#F7F7F0] hover:text-[#1C1C1C]"
-                }`}
-                onClick={() => selectOption("")}
-                role="option"
-                type="button"
-              >
-                <span className="truncate">{placeholder}</span>
-                {!value ? <Check className="h-4 w-4 shrink-0" aria-hidden /> : null}
-              </button>
-
-              {options.map((option) => {
-                const isSelected = option === value;
-
-                return (
+            {searchable ? (
+              <div className="flex items-center gap-2 border-b border-[#F1F1EA] px-3 py-2">
+                <Search className="h-4 w-4 shrink-0 text-[#B11116]" aria-hidden />
+                <input
+                  ref={searchRef}
+                  aria-label={`Pesquisar ${label}`}
+                  className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-[#1C1C1C] outline-none placeholder:text-[#8C8C84]"
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={`Pesquisar ${label.toLowerCase()}...`}
+                  type="text"
+                  value={query}
+                />
+                {query ? (
                   <button
-                    aria-selected={isSelected}
-                    className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-[6px] px-3 text-left text-sm font-bold transition-colors ${
-                      isSelected ? "bg-[#B11116]/10 text-[#B11116]" : "text-[#5F5F5A] hover:bg-[#F7F7F0] hover:text-[#1C1C1C]"
-                    }`}
-                    key={option}
-                    onClick={() => selectOption(option)}
-                    role="option"
+                    aria-label="Limpar pesquisa"
+                    className="shrink-0 text-[#8C8C84] hover:text-[#1C1C1C]"
+                    onClick={() => { setQuery(""); searchRef.current?.focus(); }}
                     type="button"
                   >
-                    <span className="truncate">{option}</span>
-                    {isSelected ? <Check className="h-4 w-4 shrink-0" aria-hidden /> : null}
+                    ×
                   </button>
-                );
-              })}
+                ) : null}
+              </div>
+            ) : null}
+
+            <div className="max-h-64 overflow-auto p-1.5" role="listbox">
+              {!query ? (
+                <button
+                  aria-selected={!value}
+                  className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-[6px] px-3 text-left text-sm font-bold transition-colors ${
+                    !value ? "bg-[#B11116]/10 text-[#B11116]" : "text-[#5F5F5A] hover:bg-[#F7F7F0] hover:text-[#1C1C1C]"
+                  }`}
+                  onClick={() => selectOption("")}
+                  role="option"
+                  type="button"
+                >
+                  <span className="truncate">{placeholder}</span>
+                  {!value ? <Check className="h-4 w-4 shrink-0" aria-hidden /> : null}
+                </button>
+              ) : null}
+
+              {filteredOptions.length === 0 ? (
+                <p className="px-3 py-3 text-sm font-semibold text-[#8C8C84]">
+                  Nenhuma cidade encontrada para &ldquo;{query}&rdquo;
+                </p>
+              ) : (
+                filteredOptions.map((option) => {
+                  const isSelected = option === value;
+
+                  return (
+                    <button
+                      aria-selected={isSelected}
+                      className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-[6px] px-3 text-left text-sm font-bold transition-colors ${
+                        isSelected ? "bg-[#B11116]/10 text-[#B11116]" : "text-[#5F5F5A] hover:bg-[#F7F7F0] hover:text-[#1C1C1C]"
+                      }`}
+                      key={option}
+                      onClick={() => selectOption(option)}
+                      role="option"
+                      type="button"
+                    >
+                      <span className="truncate">{option}</span>
+                      {isSelected ? <Check className="h-4 w-4 shrink-0" aria-hidden /> : null}
+                    </button>
+                  );
+                })
+              )}
             </div>
           </div>
         ) : null}
@@ -221,6 +276,9 @@ function StoreCard({
   onSelect: () => void;
   store: StoreWithDistance;
 }>) {
+  const phoneDigits = store.phone?.replace(/\D/g, "") ?? "";
+  const hasPhone = phoneDigits.length > 0;
+
   return (
     <article
       className={`rounded-[8px] border bg-white p-4 transition-all ${
@@ -254,12 +312,22 @@ function StoreCard({
         </span>
       </button>
 
-      <div className="mt-4 grid gap-2 border-t border-[#F1F1EA] pt-4 text-sm text-[#5F5F5A]">
-        <a className="flex items-center gap-2 transition-colors hover:text-[#B11116]" href={`tel:${store.phone.replace(/\D/g, "")}`}>
-          <Phone className="h-4 w-4 text-[#B11116]" aria-hidden />
-          {store.phone}
-        </a>
-      </div>
+      {hasPhone || store.email ? (
+        <div className="mt-4 grid gap-2 border-t border-[#F1F1EA] pt-4 text-sm text-[#5F5F5A]">
+          {hasPhone ? (
+            <a className="flex items-center gap-2 transition-colors hover:text-[#B11116]" href={`tel:${phoneDigits}`}>
+              <Phone className="h-4 w-4 text-[#B11116]" aria-hidden />
+              {store.phone}
+            </a>
+          ) : null}
+          {store.email ? (
+            <a className="flex items-center gap-2 break-all transition-colors hover:text-[#B11116]" href={`mailto:${store.email}`}>
+              <Mail className="h-4 w-4 shrink-0 text-[#B11116]" aria-hidden />
+              {store.email}
+            </a>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="mt-4 flex flex-wrap gap-2">
         <a
@@ -271,15 +339,17 @@ function StoreCard({
           <Navigation className="h-3.5 w-3.5" aria-hidden />
           Rota
         </a>
-        <a
-          className="inline-flex items-center gap-2 rounded-full border border-[#E7E7DE] px-4 py-2 text-xs font-black uppercase tracking-[0.08em] text-[#1C1C1C] transition-colors hover:border-[#B11116]/40 hover:text-[#B11116]"
-          href={`https://wa.me/${store.phone.replace(/\D/g, "")}`}
-          rel="noreferrer"
-          target="_blank"
-        >
-          WhatsApp
-          <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
-        </a>
+        {hasPhone ? (
+          <a
+            className="inline-flex items-center gap-2 rounded-full border border-[#E7E7DE] px-4 py-2 text-xs font-black uppercase tracking-[0.08em] text-[#1C1C1C] transition-colors hover:border-[#B11116]/40 hover:text-[#B11116]"
+            href={`https://wa.me/${phoneDigits}`}
+            rel="noreferrer"
+            target="_blank"
+          >
+            WhatsApp
+            <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
+          </a>
+        ) : null}
       </div>
     </article>
   );
@@ -324,32 +394,52 @@ export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorPr
 
   const [representativeState, setRepresentativeState] = useState("");
   const [representativeCity, setRepresentativeCity] = useState("");
-  const [representativeStates, setRepresentativeStates] = useState<string[]>(() => getRepresentativeStates());
   const [representativeCities, setRepresentativeCities] = useState<string[]>([]);
+  const [representativeCitiesStatus, setRepresentativeCitiesStatus] = useState<SearchStatus>("idle");
   const [representatives, setRepresentatives] = useState<RepresentativeLocation[]>([]);
   const [representativeStatus, setRepresentativeStatus] = useState<SearchStatus>("idle");
+  const [representativeError, setRepresentativeError] = useState("");
 
-  const [selectedStoreId, setSelectedStoreId] = useState(MOCK_STORES[0]?.id);
+  const [stores, setStores] = useState<StoreWithDistance[]>(MOCK_STORES);
+  const [selectedStoreId, setSelectedStoreId] = useState<string | undefined>(MOCK_STORES[0]?.id);
   const [status, setStatus] = useState<SearchStatus>("idle");
   const [userLocation, setUserLocation] = useState<GeoPoint | undefined>();
   const [locationContext, setLocationContext] = useState<LocationContext>();
   const [isDetectingIpLocation, setIsDetectingIpLocation] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  const storesAbortRef = useRef<AbortController | null>(null);
   const ipLocationAbortRef = useRef<AbortController | null>(null);
-  const representativeStatesAbortRef = useRef<AbortController | null>(null);
   const representativeCitiesAbortRef = useRef<AbortController | null>(null);
   const representativeAbortRef = useRef<AbortController | null>(null);
   const hasManualLocationSearchRef = useRef(false);
+  const hasRankedStoresRef = useRef(false);
   const cacheRef = useRef(new Map<string, GeocodedCep>());
 
-  useEffect(() => {
-    setActiveMode(initialMode);
-  }, [initialMode]);
+  function applyStoreResults(nextStores: StoreWithDistance[], ranked = false) {
+    if (nextStores.length === 0) {
+      return;
+    }
 
-  useEffect(() => () => abortRef.current?.abort(), []);
+    if (ranked) {
+      hasRankedStoresRef.current = true;
+    }
+
+    setStores(nextStores);
+    setSelectedStoreId((current) =>
+      nextStores.some((store) => store.id === current) ? current : nextStores[0]?.id,
+    );
+  }
+
   useEffect(
     () => () => {
-      representativeStatesAbortRef.current?.abort();
+      abortRef.current?.abort();
+      storesAbortRef.current?.abort();
+      ipLocationAbortRef.current?.abort();
+    },
+    [],
+  );
+  useEffect(
+    () => () => {
       representativeCitiesAbortRef.current?.abort();
       representativeAbortRef.current?.abort();
     },
@@ -357,53 +447,39 @@ export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorPr
   );
 
   useEffect(() => {
-    const controller = new AbortController();
-    representativeStatesAbortRef.current = controller;
-
-    void fetchRepresentativeStates(controller.signal)
-      .then((states) => {
-        if (controller.signal.aborted) {
-          return;
-        }
-
-        setRepresentativeStates(states);
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) {
-          setRepresentativeStates(getRepresentativeStates());
-        }
-      })
-      .finally(() => {
-        if (representativeStatesAbortRef.current === controller) {
-          representativeStatesAbortRef.current = null;
-        }
-      });
-  }, []);
-
-  useEffect(() => {
     representativeCitiesAbortRef.current?.abort();
     setRepresentativeCity("");
+    setRepresentatives([]);
+    setRepresentativeStatus("idle");
+    setRepresentativeError("");
 
     if (!representativeState) {
       setRepresentativeCities([]);
+      setRepresentativeCitiesStatus("idle");
       return;
     }
 
     const controller = new AbortController();
     representativeCitiesAbortRef.current = controller;
+    setRepresentativeCitiesStatus("loading");
 
-    void fetchRepresentativeCitiesByState(representativeState, controller.signal)
+    void fetchRepresentativeCitiesByUf(representativeState, controller.signal)
       .then((cities) => {
         if (controller.signal.aborted) {
           return;
         }
 
         setRepresentativeCities(cities);
+        setRepresentativeCitiesStatus("success");
       })
-      .catch(() => {
-        if (!controller.signal.aborted) {
-          setRepresentativeCities(getRepresentativeCities(representativeState));
+      .catch((error: unknown) => {
+        if (controller.signal.aborted || (error instanceof DOMException && error.name === "AbortError")) {
+          return;
         }
+
+        setRepresentativeCities([]);
+        setRepresentativeCitiesStatus("error");
+        setRepresentativeError("Não foi possível carregar as cidades. Tente novamente em instantes.");
       })
       .finally(() => {
         if (representativeCitiesAbortRef.current === controller) {
@@ -424,8 +500,9 @@ export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorPr
     const controller = new AbortController();
     representativeAbortRef.current = controller;
     setRepresentativeStatus("loading");
+    setRepresentativeError("");
 
-    void fetchRepresentativesByLocation(representativeState, representativeCity, controller.signal)
+    void fetchRepresentativesByCity(representativeCity, controller.signal)
       .then((nextRepresentatives) => {
         if (controller.signal.aborted) {
           return;
@@ -434,20 +511,56 @@ export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorPr
         setRepresentatives(nextRepresentatives);
         setRepresentativeStatus("success");
       })
-      .catch(() => {
-        if (controller.signal.aborted) {
+      .catch((error: unknown) => {
+        if (controller.signal.aborted || (error instanceof DOMException && error.name === "AbortError")) {
           return;
         }
 
-        setRepresentatives(getRepresentativesByLocation(representativeState, representativeCity));
-        setRepresentativeStatus("success");
+        setRepresentatives([]);
+        setRepresentativeStatus("error");
+        setRepresentativeError("Não foi possível carregar os representantes. Tente novamente em instantes.");
       })
       .finally(() => {
         if (representativeAbortRef.current === controller) {
           representativeAbortRef.current = null;
         }
       });
-  }, [representativeCity, representativeState]);
+  }, [representativeCity]);
+
+  useEffect(() => {
+    let isActive = true;
+    const controller = new AbortController();
+
+    storesAbortRef.current = controller;
+
+    void fetchStores(controller.signal)
+      .then((nextStores) => {
+        if (
+          !isActive ||
+          controller.signal.aborted ||
+          hasManualLocationSearchRef.current ||
+          hasRankedStoresRef.current ||
+          nextStores.length === 0
+        ) {
+          return;
+        }
+
+        applyStoreResults(nextStores);
+      })
+      .catch(() => {
+        // The mock list remains as a harmless visual fallback while the API is unavailable.
+      })
+      .finally(() => {
+        if (storesAbortRef.current === controller) {
+          storesAbortRef.current = null;
+        }
+      });
+
+    return () => {
+      isActive = false;
+      controller.abort();
+    };
+  }, []);
 
   useEffect(() => {
     let isActive = true;
@@ -457,16 +570,23 @@ export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorPr
     setIsDetectingIpLocation(true);
 
     void geolocateByIp(controller.signal)
-      .then((result) => {
+      .then(async (result) => {
         if (!isActive || controller.signal.aborted || hasManualLocationSearchRef.current) {
           return;
         }
 
-        const storesByDistance = getStoresByDistance(result.coordinates);
+        const storesByDistance = await fetchNearbyStores(result.coordinates, {
+          signal: controller.signal,
+          limit: 6,
+        });
+
+        if (!isActive || controller.signal.aborted || hasManualLocationSearchRef.current) {
+          return;
+        }
 
         setUserLocation(result.coordinates);
         setLocationContext({ source: "ip", label: result.label });
-        setSelectedStoreId(storesByDistance[0]?.id);
+        applyStoreResults(storesByDistance, true);
       })
       .catch(() => {
         // IP-based geolocation is only a convenience; CEP search remains available.
@@ -486,21 +606,9 @@ export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorPr
     };
   }, []);
 
-  const rankedStores = useMemo<StoreWithDistance[]>(() => {
-    if (!userLocation) {
-      return MOCK_STORES;
-    }
-
-    return getStoresByDistance(userLocation);
-  }, [userLocation]);
-
   const visibleStores = useMemo(() => {
-    if (!userLocation) {
-      return rankedStores;
-    }
-
-    return rankedStores.slice(0, 6);
-  }, [rankedStores, userLocation]);
+    return stores.slice(0, 6);
+  }, [stores]);
 
   const selectedStore = visibleStores.find((store) => store.id === selectedStoreId) ?? visibleStores[0];
   const storeSearchHint = useMemo(() => {
@@ -553,11 +661,19 @@ export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorPr
         cacheRef.current.set(normalizedCep, result);
       }
 
-      const storesByDistance = getStoresByDistance(result.coordinates);
+      const storesByDistance = await fetchNearbyStores(result.coordinates, {
+        signal: controller.signal,
+        limit: 6,
+      });
+
+      if (storesByDistance.length === 0) {
+        throw new Error("Nenhuma loja geolocalizada encontrada para esse CEP.");
+      }
+
       setUserLocation(result.coordinates);
       setLocationContext({ source: "cep", label: result.label });
 
-      setSelectedStoreId(storesByDistance[0]?.id);
+      applyStoreResults(storesByDistance, true);
       setStatus("success");
     } catch (error) {
       if (controller.signal.aborted) {
@@ -660,39 +776,35 @@ export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorPr
               </label>
             </form>
           ) : (
-            <div className="grid gap-5 md:grid-cols-[1fr_1fr_auto] md:items-end">
+            <div className="grid gap-5 md:grid-cols-2 md:items-end">
               <DropdownSelect
                 label="Estado"
                 onChange={(state) => {
                   setRepresentativeState(state);
                   setRepresentativeCity("");
                 }}
-                options={representativeStates}
+                options={REPRESENTATIVE_STATES}
                 placeholder="Selecione o estado"
                 value={representativeState}
               />
 
               <DropdownSelect
-                disabled={!representativeState}
+                disabled={!representativeState || representativeCitiesStatus === "loading"}
                 label="Cidade"
                 onChange={setRepresentativeCity}
                 options={representativeCities}
-                placeholder="Todas as cidades"
+                placeholder={
+                  !representativeState
+                    ? "Selecione o estado primeiro"
+                    : representativeCitiesStatus === "loading"
+                      ? "Carregando cidades..."
+                      : representativeCities.length === 0
+                        ? "Nenhuma cidade disponível"
+                        : "Selecione a cidade"
+                }
+                searchable
                 value={representativeCity}
               />
-
-              <button
-                className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-[#B11116] px-7 text-sm font-black uppercase tracking-[0.08em] text-white shadow-[0_20px_45px_-22px_rgba(177,17,22,0.9)] transition-all hover:-translate-y-0.5 hover:bg-[#A00010] disabled:cursor-not-allowed disabled:opacity-65 disabled:hover:translate-y-0"
-                disabled={!representativeState || representativeStatus === "loading"}
-                type="button"
-              >
-                {representativeStatus === "loading" ? (
-                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                ) : (
-                  <Search className="h-4 w-4" aria-hidden />
-                )}
-                Filtrar
-              </button>
             </div>
           )}
         </motion.div>
@@ -735,21 +847,73 @@ export function StoreLocator({ initialMode = "stores" }: Readonly<StoreLocatorPr
           </motion.div>
         ) : (
           <motion.div className="grid gap-6" variants={itemVariants}>
+            {representativeError ? (
+              <div
+                aria-live="polite"
+                className="rounded-[8px] border border-[#B11116]/25 bg-[#B11116]/10 p-4 text-sm font-semibold text-[#B11116]"
+              >
+                {representativeError}
+              </div>
+            ) : null}
+
             <div className="grid gap-4 md:grid-cols-2">
-              {!representativeCity ? (
+              {!representativeState ? (
+                <div className="rounded-[8px] border border-[#E7E7DE] bg-white p-6 text-sm font-semibold text-[#5F5F5A] md:col-span-2">
+                  Selecione um estado para começar.
+                </div>
+              ) : representativeCitiesStatus === "loading" ? (
+                <div className="flex items-center gap-3 rounded-[8px] border border-[#E7E7DE] bg-white p-6 text-sm font-semibold text-[#5F5F5A] md:col-span-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-[#B11116]" aria-hidden />
+                  Carregando cidades de {representativeState}...
+                </div>
+              ) : representativeCities.length === 0 && representativeCitiesStatus === "success" ? (
+                <div className="rounded-[8px] border border-[#E7E7DE] bg-white p-6 text-sm font-semibold text-[#5F5F5A] md:col-span-2">
+                  Nenhuma cidade atendida em {representativeState} no momento.
+                </div>
+              ) : !representativeCity ? (
                 <div className="rounded-[8px] border border-[#E7E7DE] bg-white p-6 text-sm font-semibold text-[#5F5F5A] md:col-span-2">
                   Selecione uma cidade para ver os representantes disponíveis.
                 </div>
+              ) : representativeStatus === "loading" ? (
+                <div className="flex items-center gap-3 rounded-[8px] border border-[#E7E7DE] bg-white p-6 text-sm font-semibold text-[#5F5F5A] md:col-span-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-[#B11116]" aria-hidden />
+                  Buscando representantes em {representativeCity}...
+                </div>
               ) : representatives.length > 0 ? (
-                representatives.map((representative) => (
-                  <RepresentativeCard key={`${representative.email}-${representative.name}`} representative={representative} />
+                representatives.map((representative, index) => (
+                  <RepresentativeCard
+                    key={`${representative.email || "no-email"}-${representative.name}-${index}`}
+                    representative={representative}
+                  />
                 ))
+              ) : representativeStatus === "error" ? (
+                <div className="rounded-[8px] border border-[#B11116]/25 bg-[#B11116]/10 p-6 text-sm font-semibold text-[#B11116] md:col-span-2">
+                  Não foi possível carregar os representantes agora. Tente novamente em instantes.
+                </div>
               ) : (
                 <div className="rounded-[8px] border border-[#E7E7DE] bg-white p-6 text-sm font-semibold text-[#5F5F5A] md:col-span-2">
-                  Nenhum representante encontrado para essa combinação de estado e cidade.
+                  Nenhum representante encontrado para {representativeCity}.
                 </div>
               )}
             </div>
+
+            <p className="text-center text-sm font-semibold text-[#5F5F5A]">
+              Não encontrou sua cidade? Favor entrar em contato através do email{" "}
+              <a
+                className="font-bold text-[#B11116] transition-colors hover:text-[#A00010]"
+                href="mailto:contato@maza.com.br"
+              >
+                contato@maza.com.br
+              </a>{" "}
+              ou pelo telefone{" "}
+              <a
+                className="font-bold text-[#B11116] transition-colors hover:text-[#A00010]"
+                href="tel:+551936562570"
+              >
+                (19) 3656-2570
+              </a>
+              .
+            </p>
           </motion.div>
         )}
       </motion.div>

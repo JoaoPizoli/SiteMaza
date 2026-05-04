@@ -163,6 +163,55 @@
 .animate-maza-in    { animation: maza-fade-in .6s ease-out both; }
 .animate-maza-nav-enter { animation: maza-nav-enter .5s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
+@keyframes maza-timeline-paint-glint {
+  from { transform: translateX(-28%); opacity: 0; }
+  34% { opacity: 0.72; }
+  to { transform: translateX(42%); opacity: 0; }
+}
+
+.maza-timeline-paint-line {
+  height: 10px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 7% 55%, rgba(255, 217, 150, 0.8) 0 2px, transparent 3px),
+    radial-gradient(circle at 38% 20%, rgba(255, 255, 255, 0.42) 0 2px, transparent 3px),
+    radial-gradient(circle at 72% 68%, rgba(255, 217, 150, 0.55) 0 2px, transparent 4px),
+    linear-gradient(90deg, #B11116 0%, #D7241E 26%, #FBB943 52%, #D7241E 76%, #B11116 100%);
+  box-shadow:
+    0 12px 26px -16px rgba(177, 17, 22, 0.68),
+    inset 0 1px 1px rgba(255, 255, 255, 0.38),
+    inset 0 -2px 3px rgba(122, 11, 15, 0.22);
+  filter: saturate(1.08);
+  overflow: visible;
+}
+
+.maza-timeline-paint-line::before,
+.maza-timeline-paint-line::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.maza-timeline-paint-line::before {
+  inset: -5px -8px;
+  border-radius: inherit;
+  background:
+    radial-gradient(12px 8px at 9% 72%, rgba(177, 17, 22, 0.42), transparent 70%),
+    radial-gradient(18px 9px at 24% 20%, rgba(251, 185, 67, 0.34), transparent 72%),
+    radial-gradient(11px 7px at 44% 78%, rgba(177, 17, 22, 0.32), transparent 72%),
+    radial-gradient(18px 10px at 68% 22%, rgba(251, 185, 67, 0.32), transparent 72%),
+    radial-gradient(14px 8px at 88% 76%, rgba(177, 17, 22, 0.34), transparent 72%);
+  opacity: 0.9;
+}
+
+.maza-timeline-paint-line::after {
+  inset: 1px 10% auto 7%;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+  animation: maza-timeline-paint-glint 2.2s ease-in-out infinite;
+}
+
 /* Grid sutil de pontos (usado no Hero) */
 .bg-maza-grid {
   background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);

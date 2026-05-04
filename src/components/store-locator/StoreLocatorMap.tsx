@@ -140,6 +140,7 @@ export function StoreLocatorMap({
 
       {stores.map((store, index) => {
         const isActive = store.id === selectedStore?.id;
+        const phoneDigits = store.phone?.replace(/\D/g, "") ?? "";
 
         return (
           <Marker
@@ -172,13 +173,15 @@ export function StoreLocatorMap({
                     <Navigation className="h-3.5 w-3.5" aria-hidden />
                     Rota
                   </a>
-                  <a
-                    className="inline-flex items-center gap-1.5 rounded-full border border-[#EBEBEB] px-3 py-2 text-xs font-bold text-[#1C1C1C] transition-colors hover:border-[#B11116]/40 hover:text-[#B11116]"
-                    href={`tel:${store.phone.replace(/\D/g, "")}`}
-                  >
-                    <Phone className="h-3.5 w-3.5" aria-hidden />
-                    Ligar
-                  </a>
+                  {phoneDigits ? (
+                    <a
+                      className="inline-flex items-center gap-1.5 rounded-full border border-[#EBEBEB] px-3 py-2 text-xs font-bold text-[#1C1C1C] transition-colors hover:border-[#B11116]/40 hover:text-[#B11116]"
+                      href={`tel:${phoneDigits}`}
+                    >
+                      <Phone className="h-3.5 w-3.5" aria-hidden />
+                      Ligar
+                    </a>
+                  ) : null}
                   <a
                     className="inline-flex items-center gap-1.5 rounded-full border border-[#EBEBEB] px-3 py-2 text-xs font-bold text-[#1C1C1C] transition-colors hover:border-[#B11116]/40 hover:text-[#B11116]"
                     href={`https://www.google.com/maps/search/?api=1&query=${store.coordinates.lat},${store.coordinates.lng}`}

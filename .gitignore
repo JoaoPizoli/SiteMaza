@@ -6,6 +6,7 @@
 
 # dependencies
 /node_modules
+/back-site/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -16,6 +17,7 @@
 
 # testing
 /coverage
+/back-site/coverage
 
 # next.js
 /.next/
@@ -23,6 +25,7 @@
 
 # production
 /build
+/back-site/dist
 
 # misc
 .DS_Store
@@ -36,6 +39,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+!**/.env.example
 
 # vercel
 .vercel
