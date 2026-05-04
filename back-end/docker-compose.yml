@@ -12,5 +12,21 @@ services:
     volumes:
       - maza_site:/var/lib/postgresql/data
 
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: maza-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+    ports:
+      - "3002:3002"
+    depends_on:
+      - postgres
+
 volumes:
   maza_site:
