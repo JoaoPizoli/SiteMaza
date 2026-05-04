@@ -1,12 +1,12 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-/.trae/
 /.claude/
 /docs
 
 # dependencies
 /node_modules
-/back-site/node_modules
+/front-end/node_modules
+/back-end/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -17,15 +17,19 @@
 
 # testing
 /coverage
-/back-site/coverage
+/front-end/coverage
+/back-end/coverage
 
 # next.js
 /.next/
+/front-end/.next/
 /out/
+/front-end/out/
 
 # production
 /build
-/back-site/dist
+/front-end/build
+/back-end/dist
 
 # misc
 .DS_Store
@@ -44,6 +48,7 @@ yarn-error.log*
 
 # vercel
 .vercel
+/front-end/.vercel
 
 # typescript
 *.tsbuildinfo

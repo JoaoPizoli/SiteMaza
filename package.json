@@ -1,47 +1,14 @@
 {
   "name": "site-maza",
-  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "dev:front": "next dev",
-    "dev:back": "npm --prefix back-site run start:dev",
-    "build": "next build",
-    "build:front": "next build",
-    "build:back": "npm --prefix back-site run build",
-    "start": "next start",
-    "start:front": "next start",
-    "start:back": "npm --prefix back-site run start:prod",
-    "lint": "eslint",
-    "lint:front": "eslint",
-    "lint:back": "npm --prefix back-site run lint"
-  },
-  "dependencies": {
-    "@radix-ui/react-slot": "^1.2.4",
-    "@turf/turf": "^7.3.5",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "embla-carousel-autoplay": "^8.6.0",
-    "embla-carousel-react": "^8.6.0",
-    "framer-motion": "^12.34.3",
-    "gsap": "^3.15.0",
-    "leaflet": "^1.9.4",
-    "lucide-react": "^0.575.0",
-    "next": "16.1.6",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "react-leaflet": "^5.0.0",
-    "tailwind-merge": "^3.5.0"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/leaflet": "^1.9.21",
-    "@types/node": "^20.19.33",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.1.6",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "dev:front": "npm --prefix front-end run dev",
+    "dev:back": "npm --prefix back-end run start:dev",
+    "build:front": "npm --prefix front-end run build",
+    "build:back": "npm --prefix back-end run build",
+    "start:front": "npm --prefix front-end run start",
+    "start:back": "npm --prefix back-end run start:prod",
+    "lint:front": "npm --prefix front-end run lint",
+    "lint:back": "npm --prefix back-end run lint"
   }
 }
