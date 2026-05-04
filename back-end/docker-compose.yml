@@ -4,13 +4,13 @@ services:
     container_name: maza-lojas-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: maza_lojas
-      POSTGRES_USER: maza
-      POSTGRES_PASSWORD: maza
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
-      - maza_lojas_postgres_data:/var/lib/postgresql/data
+      - maza_site:/var/lib/postgresql/data
 
 volumes:
-  maza_lojas_postgres_data:
+  maza_site:
