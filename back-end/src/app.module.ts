@@ -8,6 +8,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ErpModule } from './common/erp/erp.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { RepresentanteAdminModule } from './representante-admin/representante-admin.module';
 
 @Module({
   imports: [
@@ -32,13 +35,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       throttlers: [
         {
           ttl: 60_000,
-          limit: 50,
+          limit: 300,
         },
       ],
     }),
     LojaModule,
     RepresentanteModule,
+    RepresentanteAdminModule,
     ErpModule,
+    UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

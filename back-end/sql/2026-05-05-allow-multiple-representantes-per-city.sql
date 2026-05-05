@@ -1,0 +1,7 @@
+DROP INDEX IF EXISTS "IDX_REPCIDADE_UF_CIDADE";
+
+CREATE INDEX IF NOT EXISTS "IDX_REPCIDADE_UF_CIDADE"
+  ON representante_cidade (uf, cidade);
+
+CREATE INDEX IF NOT EXISTS "IDX_REPCIDADE_UF_CIDADE_NOME"
+  ON representante_cidade (uf, cidade, nome);

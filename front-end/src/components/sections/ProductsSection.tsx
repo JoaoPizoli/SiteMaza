@@ -53,7 +53,7 @@ export function ProductsSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full bg-white py-24 lg:py-32 px-6 xl:px-10 overflow-hidden"
+      className="relative w-full overflow-hidden bg-white px-6 pb-0 pt-24 lg:pt-32 xl:px-10"
     >
       <div
         className="w-full max-w-[1440px] mx-auto flex flex-col gap-14"
@@ -99,32 +99,36 @@ export function ProductsSection() {
       {/* Certificados */}
       <div
         data-gsap-reveal
-        className="w-full max-w-[1440px] mx-auto mt-20 lg:mt-28"
+        className="relative -mx-6 mt-20 px-6 pb-20 pt-0 lg:mt-28 lg:pb-28 xl:-mx-10 xl:px-10"
       >
-        <div className="flex items-center gap-6 mb-10">
-          <div className="h-px flex-1 bg-[#DEDED6]" />
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(251,185,67,0.15)] border border-[rgba(251,185,67,0.35)]">
-            <span className="font-black text-[12px] tracking-[0.14em] text-[#B11116]">
-              CERTIFICADOS
-            </span>
-          </div>
-          <div className="h-px flex-1 bg-[#DEDED6]" />
-        </div>
-
-        <div className="flex justify-center items-center gap-10 lg:gap-16 flex-wrap grayscale opacity-70 hover:opacity-100 hover:grayscale-0 transition-all duration-500">
-          {CERTIFICATES.map((c) => (
-            <div key={c.src} className="relative transition-transform hover:scale-110 duration-300" style={{ width: c.w, height: c.h }}>
-              <Image
-                src={c.src}
-                alt=""
-                fill
-                sizes={`${c.w}px`}
-                quality={75}
-                loading="lazy"
-                className="object-contain"
-              />
+        <div className="relative z-10 max-w-[1440px] mx-auto">
+          <div className="flex items-center gap-6 mb-12">
+            <div className="h-px flex-1 bg-[#DEDED6]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(251,185,67,0.15)] border border-[rgba(251,185,67,0.35)]">
+              <span className="font-black text-[12px] tracking-[0.14em] text-[#B11116]">
+                CERTIFICADOS
+              </span>
             </div>
-          ))}
+            <div className="h-px flex-1 bg-[#DEDED6]" />
+          </div>
+
+          <div className="flex min-h-[120px] flex-wrap items-center justify-center gap-10 grayscale opacity-70 transition-all duration-500 hover:opacity-100 hover:grayscale-0 lg:gap-16">
+            {CERTIFICATES.map((c) => (
+              <div key={c.src} className="grid h-[120px] place-items-center">
+                <div className="relative transition-transform duration-300 hover:scale-110" style={{ width: c.w, height: c.h }}>
+                  <Image
+                    src={c.src}
+                    alt=""
+                    fill
+                    sizes={`${c.w}px`}
+                    quality={75}
+                    loading="lazy"
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -153,30 +157,15 @@ function ProductCard({ title, image, href, desc }: ProductCardProps) {
           sizes="(min-width: 1440px) 680px, (min-width: 768px) 50vw, 100vw"
           quality={65}
           loading="lazy"
-          className="object-cover transition-transform duration-700 group-hover:scale-[1.08]"
+          className="z-0 object-cover transition-transform duration-700 group-hover:scale-[1.08]"
         />
         {/* Overlay gradiente */}
         <div
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-[#1C1C1C]/60 to-transparent opacity-85 group-hover:opacity-95 transition-opacity"
+          className="absolute inset-0 z-[1] bg-gradient-to-t from-[#1C1C1C] via-[#1C1C1C]/70 to-[#1C1C1C]/10 opacity-95"
         />
-        {/* Halo dourado no hover */}
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{
-            background:
-              "radial-gradient(circle at 80% 20%, rgba(251,185,67,0.25) 0%, transparent 60%)",
-          }}
-        />
-        <div
-          aria-hidden
-          data-gsap-card-glare
-          className="absolute inset-0 pointer-events-none opacity-0 mix-blend-screen"
-        />
-
         {/* Conteúdo */}
-        <div className="absolute inset-0 p-5 sm:p-7 lg:p-8 flex flex-col justify-end">
+        <div className="absolute inset-0 z-[2] p-5 sm:p-7 lg:p-8 flex flex-col justify-end">
           <div className="flex items-end justify-between gap-3 sm:gap-4">
             <div className="flex min-w-0 flex-1 flex-col gap-1">
               <h3 className="font-roboto font-bold text-[22px] sm:text-[26px] lg:text-[32px] text-white leading-tight break-words [overflow-wrap:anywhere]">

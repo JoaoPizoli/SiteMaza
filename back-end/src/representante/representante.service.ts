@@ -1,61 +1,29 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ILike, Repository } from 'typeorm';
 import { ErpConnectionService } from 'src/common/erp/erp-connection.service';
 import { RepreResponseDto } from './dto/repre-response.dto';
+import { RepresentanteCidadeEntity } from '../representante-admin/entities/representante-cidade.entity';
 
 @Injectable()
 export class RepresentanteService {
-  constructor(private readonly erpConnectionService: ErpConnectionService) {}
-
-  private removeUfDoNome(nome: string): string {
-    return nome
-      .replace(
-        /[\s\u00a0]*[\(\uff08]\s*(?:RP\s*(?:[-\u2010-\u2015/]\s*)?)?(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)\s*[\)\uff09][\s\u00a0]*$/i,
-        '',
-      )
-      .trim();
-  }
+  constructor(
+    private readonly erpConnectionService: ErpConnectionService,
+    @InjectRepository(RepresentanteCidadeEntity)
+    private readonly repCidadeRepository: Repository<RepresentanteCidadeEntity>,
+  ) {}
 
   async getRepresentantes(cidade: string): Promise<RepreResponseDto[]> {
-    const representantes =
-      await this.erpConnectionService.query<RepreResponseDto>(
-        `
-            SELECT DISTINCT
-                CASE
-                    WHEN SUBSTRING(RIGHT(TRIM(ca.NOMREP), 7), 1, 1) = '('
-                    AND UPPER(SUBSTRING(RIGHT(TRIM(ca.NOMREP), 7), 2, 3)) = 'RP-'
-                    AND SUBSTRING(RIGHT(TRIM(ca.NOMREP), 7), 7, 1) = ')'
-                    AND UPPER(SUBSTRING(RIGHT(TRIM(ca.NOMREP), 7), 5, 2)) IN (
-                        'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO',
-                        'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI',
-                        'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
-                    )
-                    THEN TRIM(LEFT(TRIM(ca.NOMREP), CHAR_LENGTH(TRIM(ca.NOMREP)) - 7))
-                    WHEN SUBSTRING(RIGHT(TRIM(ca.NOMREP), 4), 1, 1) = '('
-                    AND SUBSTRING(RIGHT(TRIM(ca.NOMREP), 4), 4, 1) = ')'
-                    AND UPPER(SUBSTRING(RIGHT(TRIM(ca.NOMREP), 4), 2, 2)) IN (
-                        'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO',
-                        'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI',
-                        'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
-                    )
-                    THEN TRIM(LEFT(TRIM(ca.NOMREP), CHAR_LENGTH(TRIM(ca.NOMREP)) - 4))
-                    ELSE TRIM(ca.NOMREP)
-                END AS name,
-                ra.NOME_FORNECEDOR AS company,
-                ra.TELEFONE_01 AS phone,
-                ra.OPERADOR_EMAIL AS email
-            FROM VW_CLIENTES_ATIVOS ca
-            INNER JOIN VW_REPRESENTANTES_ATIVOS ra
-                ON ra.NOME_OPERADOR = ca.NOMREP
-            WHERE ca.CIDADE = ?
-            AND ca.NOMREP NOT LIKE '%DESL%'
-            AND ca.NOMREP NOT LIKE '%MAZA ( DIRETO )%';
-        `,
-        [cidade.trim()],
-      );
+    const rows = await this.repCidadeRepository.find({
+      where: { cidade: ILike(cidade.trim()) },
+      order: { nome: 'ASC' },
+    });
 
-    return representantes.map((representante) => ({
-      ...representante,
-      name: this.removeUfDoNome(representante.name),
+    return rows.map((row) => ({
+      name: row.nome,
+      company: row.empresa ?? '',
+      phone: row.telefone ?? '',
+      email: row.email ?? '',
     }));
   }
 

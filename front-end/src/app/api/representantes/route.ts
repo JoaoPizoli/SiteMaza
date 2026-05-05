@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getBackendApiUrl } from "@/lib/api-config";
 
-const CACHE_TTL_SECONDS = 5 * 60;
 const UPSTREAM_TIMEOUT_MS = 8000;
 const MAX_CITY_LENGTH = 120;
 
@@ -58,7 +57,7 @@ export async function GET(request: Request) {
     const response = await fetch(upstream, {
       signal: controller.signal,
       headers: { Accept: "application/json" },
-      next: { revalidate: CACHE_TTL_SECONDS, tags: [`representantes:${cidade}`] },
+      cache: "no-store",
     });
 
     if (response.status === 404) {
@@ -66,7 +65,7 @@ export async function GET(request: Request) {
         { data: [] },
         {
           headers: {
-            "Cache-Control": `public, s-maxage=${CACHE_TTL_SECONDS}, stale-while-revalidate=${CACHE_TTL_SECONDS}`,
+            "Cache-Control": "no-store",
           },
         },
       );
@@ -88,7 +87,7 @@ export async function GET(request: Request) {
       { data: normalizeRepresentantes(rows) },
       {
         headers: {
-          "Cache-Control": `public, s-maxage=${CACHE_TTL_SECONDS}, stale-while-revalidate=${CACHE_TTL_SECONDS}`,
+          "Cache-Control": "no-store",
         },
       },
     );

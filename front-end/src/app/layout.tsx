@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Roboto } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -71,11 +72,14 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const isAdmin = headersList.get("x-layout-variant") === "admin";
+
   return (
     <html lang="pt-BR" className={roboto.variable}>
       <head>
@@ -84,15 +88,17 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
       </head>
       <body className="antialiased font-roboto">
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-md focus:bg-[#B11116] focus:text-white focus:shadow-lg"
-        >
-          Pular para o conteúdo
-        </a>
-        <Navbar />
+        {!isAdmin && (
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-md focus:bg-[#B11116] focus:text-white focus:shadow-lg"
+          >
+            Pular para o conteúdo
+          </a>
+        )}
+        {!isAdmin && <Navbar />}
         <div id="main-content">{children}</div>
-        <Footer />
+        {!isAdmin && <Footer />}
       </body>
     </html>
   );
